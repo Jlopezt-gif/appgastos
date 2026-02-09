@@ -208,18 +208,38 @@ with k4:
 # ================== GAUGE ==================
 st.markdown("### Cumplimiento del Presupuesto")
 
+# Evitar errores si presupuesto es 0
+max_val = max(presupuesto, gasto, 1)
+
 fig_gauge = go.Figure(go.Indicator(
     mode="gauge+number",
     value=gasto,
-    title={"text": "Cumplimiento del Presupuesto"},
+    number={"font": {"size": 36}},
+    title={"text": "Gasto vs Presupuesto"},
     gauge={
-        "axis": {"range": [0, max(presupuesto, gasto, 1)]},
-        "bar": {"color": "#F72D93"},
+        "axis": {"range": [0, max_val]},
+        
+        # Arco principal (lo gastado)
+        "bar": {"color": "#1E88FF", "thickness": 0.35},
+        
+        # Fondo del gauge
+        "bgcolor": "#F2F2F2",
+        
+        # Zonas de color (opcional, estilo suave)
         "steps": [
-            {"range": [0, presupuesto], "color": "#F0FDFF"},
+            {"range": [0, presupuesto], "color": "#EAF2FF"},
+            {"range": [presupuesto, max_val], "color": "#F5F5F5"},
         ],
+        
+        # Línea de objetivo (presupuesto)
+        "threshold": {
+            "line": {"color": "#1E3A8A", "width": 4},
+            "thickness": 0.75,
+            "value": presupuesto
+        }
     }
 ))
+
 st.plotly_chart(fig_gauge, use_container_width=True)
 
 # ================== BARRAS GASTO POR CATEGORIA ==================
