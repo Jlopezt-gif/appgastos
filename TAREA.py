@@ -46,6 +46,10 @@ st.markdown("""
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: 120px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .stMetric label {
@@ -59,6 +63,7 @@ st.markdown("""
         font-family: 'Roboto Condensed', sans-serif !important;
         font-size: 32px !important;
         font-weight: 700 !important;
+        margin-top: 8px !important;
     }
     
     /* Métrica con color condicional */
@@ -180,6 +185,7 @@ st.markdown("""
         .stMetric {
             background-color: #2d3748 !important;
             border: 1px solid #4A5568;
+            height: 120px;
         }
         
         .header-box {
@@ -899,20 +905,23 @@ with col3:
     )
 
 with col4:
-    # Determinar clase de color según el presupuesto disponible
+    # Determinar color según el presupuesto disponible
     if presupuesto_disponible <= 0:
-        clase_color = "metric-rojo"
+        color_valor = "#FF4444"  # Rojo
     elif presupuesto_disponible <= 100:
-        clase_color = "metric-amarillo"
+        color_valor = "#FFA333"  # Amarillo
     else:
-        clase_color = "metric-verde"
+        color_valor = "#00C851"  # Verde
     
-    st.markdown(f'<div class="{clase_color}">', unsafe_allow_html=True)
-    st.metric(
-        label="Presupuesto Disponible",
-        value=f"${presupuesto_disponible:,.2f}"
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+    # Crear métrica con HTML personalizado
+    st.markdown(f"""
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 600; color: #4E54D4;">Presupuesto Disponible</label>
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 700; color: {color_valor}; margin-top: 8px;">
+                ${presupuesto_disponible:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
