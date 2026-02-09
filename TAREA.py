@@ -124,10 +124,13 @@ st.markdown("""
     
     .header-box {
         background-color: transparent;
-        padding: 15px 0px;
+        padding: 10px 0px;
         border-radius: 0px;
         margin-bottom: 0px;
         box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
     
     .titulo-principal {
@@ -772,8 +775,8 @@ with header_col1:
         """, unsafe_allow_html=True)
 
 with header_col2:
-    # Filtros en la parte superior derecha
-    st.markdown('<div style="padding-top: 10px;">', unsafe_allow_html=True)
+    # Filtros en la parte superior derecha - ajustar padding para alineación
+    st.markdown('<div style="padding-top: 20px;">', unsafe_allow_html=True)
     
     # Obtener valores únicos para filtros
     años_disponibles = sorted(df['Año'].unique(), reverse=True)
