@@ -892,9 +892,15 @@ else:
     clase_color = "metric-verde"
 
 with col4:
-    st.markdown(f'<div class="{clase_color}">', unsafe_allow_html=True)
-    st.metric("Presupuesto Disponible", f"${presupuesto_disponible:,.2f}")
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown(f"""
+        <div class="stMetric {clase_color}">
+            <label>Presupuesto Disponible</label>
+            <div data-testid="stMetricValue">
+                ${presupuesto_disponible:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+)
 
 # ============================================
 # GRÁFICOS
