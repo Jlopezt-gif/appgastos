@@ -90,15 +90,23 @@ st.markdown("""
     }
     
     .dataframe thead tr th {
-        background-color: #4E54D4 !important;
-        color: white !important;
         font-weight: 700 !important;
         padding: 8px !important;
+        color: white !important;
     }
     
     .dataframe tbody tr td {
         background-color: #FFFFFF !important;
         color: #333333 !important;
+    }
+    
+    /* Colores específicos para encabezados de tablas */
+    div[data-testid="stDataFrame"]:nth-of-type(1) .dataframe thead tr th {
+        background-color: #00C851 !important;
+    }
+    
+    div[data-testid="stDataFrame"]:nth-of-type(2) .dataframe thead tr th {
+        background-color: #4E54D4 !important;
     }
     
     .stSelectbox label, .stMultiSelect label {
@@ -169,6 +177,29 @@ st.markdown("""
         text-align: center;
         margin: 10px 0 15px 0;
         text-transform: uppercase;
+    }
+    
+    /* Ajustes responsivos para móviles */
+    @media (max-width: 768px) {
+        .block-container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .mes-grande {
+            font-size: 32px;
+        }
+        
+        .stMetric {
+            height: auto;
+            min-height: 100px;
+        }
+        
+        .stMetric [data-testid="stMetricValue"] {
+            font-size: 24px !important;
+        }
     }
     
     /* Ajustes para modo oscuro en móviles */
@@ -363,7 +394,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         domain = {'x': [0, 1], 'y': [0, 1]},
         title = {
             'text': "Cumplimiento del Presupuesto",
-            'font': {'size': 22, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 600}
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']}
         },
         gauge = {
             'axis': {
@@ -398,7 +429,27 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         paper_bgcolor="white",
         font={'color': COLORS['azul'], 'family': 'Roboto Condensed'},
         height=380,
-        margin=dict(l=20, r=20, t=70, b=20)
+        margin=dict(l=20, r=20, t=80, b=20),
+        dragmode=False
+    )
+    
+    # Título alineado a la izquierda
+    fig.update_layout(
+        title={
+            'text': "Cumplimiento del Presupuesto",
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'x': 0,
+            'xanchor': 'left',
+            'y': 0.98,
+            'yanchor': 'top'
+        }
+    )
+    
+    # Configuración para móviles - desactivar interacciones
+    fig.update_layout(
+        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
+        xaxis={'fixedrange': True},
+        yaxis={'fixedrange': True}
     )
     
     return fig
@@ -449,9 +500,9 @@ def crear_barras_horizontales_categorias(df_filtrado):
     fig.update_layout(
         title={
             'text': 'Gastos por Categoría',
-            'font': {'size': 22, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 600},
-            'x': 0.5,
-            'xanchor': 'center'
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'x': 0,
+            'xanchor': 'left'
         },
         xaxis_title='Monto ($)',
         yaxis_title='',
@@ -459,20 +510,24 @@ def crear_barras_horizontales_categorias(df_filtrado):
         paper_bgcolor='white',
         plot_bgcolor='#F8F9FA',
         height=380,
-        margin=dict(l=150, r=80, t=70, b=60),
+        margin=dict(l=150, r=80, t=80, b=60),
         xaxis=dict(
             gridcolor='#E0E0E0',
             tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
+            fixedrange=True
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12}
+            tickfont={'family': 'Roboto Condensed', 'size': 12},
+            fixedrange=True
         ),
         hoverlabel=dict(
             bgcolor="white",
             font_size=13,
             font_family="Roboto Condensed"
-        )
+        ),
+        dragmode=False,
+        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
     
     return fig
@@ -513,7 +568,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=10, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul'], 'weight': 600},
+        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -527,16 +582,16 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=10, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
         textposition='top center',
-        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['rosa'], 'weight': 600},
+        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['rosa']},
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
     ))
     
     fig.update_layout(
         title={
             'text': f'Análisis de Gasto y Presupuesto Mensual - {año_filtro}',
-            'font': {'size': 22, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 600},
-            'x': 0.5,
-            'xanchor': 'center'
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'x': 0,
+            'xanchor': 'left'
         },
         xaxis_title='Mes',
         yaxis_title='Monto ($)',
@@ -549,12 +604,14 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
             gridcolor='#E0E0E0',
             tickfont={'family': 'Roboto Condensed', 'size': 11},
             tickangle=-45,
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
+            fixedrange=True
         ),
         yaxis=dict(
             gridcolor='#E0E0E0',
             tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
+            fixedrange=True
         ),
         legend=dict(
             orientation="h",
@@ -569,7 +626,9 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
             bgcolor="white",
             font_size=13,
             font_family="Roboto Condensed"
-        )
+        ),
+        dragmode=False,
+        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
     
     return fig
@@ -604,7 +663,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         marker_color=COLORS['cian'],
         text=[f'${v:,.0f}' if v > 0 else '' for v in ingresos],
         textposition='outside',
-        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['cian'], 'weight': 600},
+        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['cian']},
         hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -616,16 +675,16 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         marker_color=COLORS['naranja'],
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
         textposition='outside',
-        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['naranja'], 'weight': 600},
+        textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['naranja']},
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
     ))
     
     fig.update_layout(
         title={
             'text': f'Ingresos vs Gastos Mensuales - {año_filtro}',
-            'font': {'size': 22, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 600},
-            'x': 0.5,
-            'xanchor': 'center'
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'x': 0,
+            'xanchor': 'left'
         },
         xaxis_title='Mes',
         yaxis_title='Monto ($)',
@@ -639,12 +698,14 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
             gridcolor='#E0E0E0',
             tickfont={'family': 'Roboto Condensed', 'size': 11},
             tickangle=-45,
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
+            fixedrange=True
         ),
         yaxis=dict(
             gridcolor='#E0E0E0',
             tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
+            fixedrange=True
         ),
         legend=dict(
             orientation="h",
@@ -658,7 +719,9 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
             bgcolor="white",
             font_size=13,
             font_family="Roboto Condensed"
-        )
+        ),
+        dragmode=False,
+        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
     
     return fig
@@ -941,11 +1004,11 @@ col1, col2 = st.columns(2)
 
 with col1:
     fig_gauge = crear_gauge_presupuesto(df_filtrado, presupuesto_mes)
-    st.plotly_chart(fig_gauge, use_container_width=True)
+    st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 with col2:
     fig_barras_h = crear_barras_horizontales_categorias(df_filtrado)
-    st.plotly_chart(fig_barras_h, use_container_width=True)
+    st.plotly_chart(fig_barras_h, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -954,11 +1017,11 @@ col1, col2 = st.columns(2)
 
 with col1:
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
-    st.plotly_chart(fig_lineas, use_container_width=True)
+    st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 with col2:
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
-    st.plotly_chart(fig_barras_v, use_container_width=True)
+    st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1007,7 +1070,14 @@ else:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
+    st.markdown(f"""
+        <h4 style="color: #00C851;">Gastos ({len(df_gastos_tabla)} registros)</h4>
+        <style>
+        div[data-testid="column"]:nth-of-type(1) div[data-testid="stDataFrame"] .dataframe thead tr th {{
+            background-color: #00C851 !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
     st.dataframe(
         df_gastos_tabla,
         use_container_width=True,
@@ -1035,7 +1105,14 @@ with col1:
     )
 
 with col2:
-    st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
+    st.markdown(f"""
+        <h4 style="color: #4E54D4;">Ingresos ({len(df_ingresos_tabla)} registros)</h4>
+        <style>
+        div[data-testid="column"]:nth-of-type(2) div[data-testid="stDataFrame"] .dataframe thead tr th {{
+            background-color: #4E54D4 !important;
+        }}
+        </style>
+    """, unsafe_allow_html=True)
     st.dataframe(
         df_ingresos_tabla,
         use_container_width=True,
