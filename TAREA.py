@@ -127,7 +127,7 @@ st.markdown("""
     
     .titulo-principal {
         color: #4E54D4;
-        font-size: 20px;
+        font-size: 16px;
         font-weight: 700;
         margin: 0;
         line-height: 1.2;
@@ -798,15 +798,9 @@ with header_col2:
     
     with filtro_col5:
         if st.button("Limpiar Filtros", use_container_width=True):
-            # Resetear a valores iniciales
-            todos_dias_reset = sorted(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]['Dia'].unique()) if len(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]) > 0 else []
-            
-            st.session_state.filtros_aplicados = {
-                'categoria': CATEGORIAS_GASTO.copy(),
-                'año': año_actual if año_actual in años_disponibles else años_disponibles[0],
-                'mes': mes_actual,
-                'dia': todos_dias_reset
-            }
+            # Limpiar completamente el session_state para volver al estado inicial
+            for key in list(st.session_state.keys()):
+                del st.session_state[key]
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
@@ -891,14 +885,10 @@ with col4:
     else:
         clase_color = "metric-verde"
     
-    delta_color = "normal" if presupuesto_disponible >= 0 else "inverse"
-    
     st.markdown(f'<div class="{clase_color}">', unsafe_allow_html=True)
     st.metric(
         label="Presupuesto Disponible",
-        value=f"${presupuesto_disponible:,.2f}",
-        delta=f"{(presupuesto_disponible/presupuesto_mes*100):.1f}%" if presupuesto_mes > 0 else "0%",
-        delta_color=delta_color
+        value=f"${presupuesto_disponible:,.2f}"
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
