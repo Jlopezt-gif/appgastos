@@ -875,32 +875,46 @@ gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 # ============================================
 # MES GRANDE Y MÉTRICAS PRINCIPALES
 # ============================================
+# Mostrar mes grande
 st.markdown(f'<div class="mes-grande">{MESES[mes_seleccionado]}</div>', unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric("Ingreso", f"${ingresos_total:,.2f}")
-col2.metric("Gasto", f"${gastos_total:,.2f}")
-col3.metric("Presupuesto", f"${presupuesto_mes:,.2f}")
+with col1:
+    st.metric(
+        label="Ingreso",
+        value=f"${ingresos_total:,.2f}"
+    )
 
-# Determinar clase de color según el presupuesto disponible
-if presupuesto_disponible <= 0:
-    clase_color = "metric-rojo"
-elif presupuesto_disponible <= 100:
-    clase_color = "metric-amarillo"
-else:
-    clase_color = "metric-verde"
+with col2:
+    st.metric(
+        label="Gasto",
+        value=f"${gastos_total:,.2f}"
+    )
+
+with col3:
+    st.metric(
+        label="Presupuesto",
+        value=f"${presupuesto_mes:,.2f}"
+    )
 
 with col4:
-    st.markdown(f"""
-        <div class="stMetric {clase_color}">
-            <label>Presupuesto Disponible</label>
-            <div data-testid="stMetricValue">
-                ${presupuesto_disponible:,.2f}
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-)
+    # Determinar clase de color según el presupuesto disponible
+    if presupuesto_disponible <= 0:
+        clase_color = "metric-rojo"
+    elif presupuesto_disponible <= 100:
+        clase_color = "metric-amarillo"
+    else:
+        clase_color = "metric-verde"
+    
+    st.markdown(f'<div class="{clase_color}">', unsafe_allow_html=True)
+    st.metric(
+        label="Presupuesto Disponible",
+        value=f"${presupuesto_disponible:,.2f}"
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
 # GRÁFICOS
