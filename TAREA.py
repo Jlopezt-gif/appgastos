@@ -1049,152 +1049,108 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
     
-    # Crear tabla HTML personalizada
-    html_gastos = """
-    <style>
-    .tabla-gastos {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Roboto Condensed', sans-serif;
-        font-size: 12px;
-        background-color: white;
-        max-height: 350px;
-        overflow-y: auto;
-        display: block;
-    }
-    .tabla-gastos thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-    .tabla-gastos thead th {
-        background-color: #00C851 !important;
-        color: white !important;
-        font-weight: 700;
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-    .tabla-gastos tbody td {
-        padding: 8px;
-        border: 1px solid #ddd;
-        background-color: white;
-        color: #333333;
-    }
-    .tabla-gastos tbody tr:hover {
-        background-color: #f5f5f5;
-    }
-    </style>
-    <div style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
-    <table class="tabla-gastos">
-        <thead>
-            <tr>
-                <th style="width: 50px;"></th>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Monto</th>
-            </tr>
-        </thead>
-        <tbody>
-    """
+    # Aplicar estilos con Pandas Styler
+    def style_gastos(df):
+        return df.style.set_table_styles([
+            {'selector': 'thead th', 'props': [
+                ('background-color', '#00C851'),
+                ('color', 'white'),
+                ('font-weight', 'bold'),
+                ('padding', '8px')
+            ]},
+            {'selector': 'tbody td', 'props': [
+                ('background-color', '#FFFFFF'),
+                ('color', '#333333')
+            ]}
+        ])
     
     if len(df_gastos_tabla) > 0:
-        for idx, row in df_gastos_tabla.iterrows():
-            html_gastos += f"""
-            <tr>
-                <td style="text-align: center;">{idx}</td>
-                <td>{row['Fecha']}</td>
-                <td>{row['Descripción']}</td>
-                <td>{row['Categoría']}</td>
-                <td>${row['Monto']:,.2f}</td>
-            </tr>
-            """
+        styled_gastos = style_gastos(df_gastos_tabla)
+        st.dataframe(
+            styled_gastos,
+            use_container_width=True,
+            height=350,
+            hide_index=False,
+            column_config={
+                "Fecha": st.column_config.TextColumn(
+                    "Fecha",
+                    width="medium",
+                ),
+                "Descripción": st.column_config.TextColumn(
+                    "Descripción",
+                    width="medium",
+                ),
+                "Categoría": st.column_config.TextColumn(
+                    "Categoría",
+                    width="small",
+                ),
+                "Monto": st.column_config.NumberColumn(
+                    "Monto",
+                    format="$%.2f",
+                    width="small",
+                ),
+            }
+        )
     else:
-        html_gastos += "<tr><td colspan='5' style='text-align: center;'>No hay datos</td></tr>"
-    
-    html_gastos += """
-        </tbody>
-    </table>
-    </div>
-    """
-    
-    st.markdown(html_gastos, unsafe_allow_html=True)
+        st.dataframe(
+            df_gastos_tabla,
+            use_container_width=True,
+            height=350,
+            hide_index=False
+        )
 
 with col2:
     st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
     
-    # Crear tabla HTML personalizada
-    html_ingresos = """
-    <style>
-    .tabla-ingresos {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Roboto Condensed', sans-serif;
-        font-size: 12px;
-        background-color: white;
-        max-height: 350px;
-        overflow-y: auto;
-        display: block;
-    }
-    .tabla-ingresos thead {
-        position: sticky;
-        top: 0;
-        z-index: 10;
-    }
-    .tabla-ingresos thead th {
-        background-color: #4E54D4 !important;
-        color: white !important;
-        font-weight: 700;
-        padding: 8px;
-        text-align: left;
-        border: 1px solid #ddd;
-    }
-    .tabla-ingresos tbody td {
-        padding: 8px;
-        border: 1px solid #ddd;
-        background-color: white;
-        color: #333333;
-    }
-    .tabla-ingresos tbody tr:hover {
-        background-color: #f5f5f5;
-    }
-    </style>
-    <div style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
-    <table class="tabla-ingresos">
-        <thead>
-            <tr>
-                <th style="width: 50px;"></th>
-                <th>Fecha</th>
-                <th>Descripción</th>
-                <th>Categoría</th>
-                <th>Monto</th>
-            </tr>
-        </thead>
-        <tbody>
-    """
+    # Aplicar estilos con Pandas Styler
+    def style_ingresos(df):
+        return df.style.set_table_styles([
+            {'selector': 'thead th', 'props': [
+                ('background-color', '#4E54D4'),
+                ('color', 'white'),
+                ('font-weight', 'bold'),
+                ('padding', '8px')
+            ]},
+            {'selector': 'tbody td', 'props': [
+                ('background-color', '#FFFFFF'),
+                ('color', '#333333')
+            ]}
+        ])
     
     if len(df_ingresos_tabla) > 0:
-        for idx, row in df_ingresos_tabla.iterrows():
-            html_ingresos += f"""
-            <tr>
-                <td style="text-align: center;">{idx}</td>
-                <td>{row['Fecha']}</td>
-                <td>{row['Descripción']}</td>
-                <td>{row['Categoría']}</td>
-                <td>${row['Monto']:,.2f}</td>
-            </tr>
-            """
+        styled_ingresos = style_ingresos(df_ingresos_tabla)
+        st.dataframe(
+            styled_ingresos,
+            use_container_width=True,
+            height=350,
+            hide_index=False,
+            column_config={
+                "Fecha": st.column_config.TextColumn(
+                    "Fecha",
+                    width="medium",
+                ),
+                "Descripción": st.column_config.TextColumn(
+                    "Descripción",
+                    width="medium",
+                ),
+                "Categoría": st.column_config.TextColumn(
+                    "Categoría",
+                    width="small",
+                ),
+                "Monto": st.column_config.NumberColumn(
+                    "Monto",
+                    format="$%.2f",
+                    width="small",
+                ),
+            }
+        )
     else:
-        html_ingresos += "<tr><td colspan='5' style='text-align: center;'>No hay datos</td></tr>"
-    
-    html_ingresos += """
-        </tbody>
-    </table>
-    </div>
-    """
-    
-    st.markdown(html_ingresos, unsafe_allow_html=True)
+        st.dataframe(
+            df_ingresos_tabla,
+            use_container_width=True,
+            height=350,
+            hide_index=False
+        )
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
