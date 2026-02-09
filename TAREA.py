@@ -126,19 +126,28 @@ st.markdown("""
     }
     
     .titulo-principal {
-        color: #4E54D4;
-        font-size: 14px;
-        font-weight: 700;
-        margin: 0;
-        line-height: 1.2;
-        white-space: nowrap;
+        color: #4E54D4 !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
     }
     
     .nombre-usuario {
-        color: #666;
-        font-size: 12px;
-        font-weight: 400;
-        margin: 5px 0 0 0;
+        color: #666 !important;
+        font-size: 12px !important;
+        font-weight: 400 !important;
+        margin: 5px 0 0 0 !important;
+    }
+    
+    /* Forzar tamaño del h1 dentro de header-box */
+    .header-box h1 {
+        font-size: 14px !important;
+    }
+    
+    .header-box p {
+        font-size: 12px !important;
     }
     
     .mes-grande {
@@ -730,6 +739,10 @@ with header_col2:
             'dia': todos_dias  # Todos los días por defecto
         }
     
+    # Key para resetear widgets
+    if 'widget_key' not in st.session_state:
+        st.session_state.widget_key = 0
+    
     filtro_col1, filtro_col2, filtro_col3, filtro_col4, filtro_col5 = st.columns([2, 1.2, 1.2, 1.2, 1.3])
     
     with filtro_col1:
@@ -740,7 +753,7 @@ with header_col2:
             "Categoría",
             options=CATEGORIAS_GASTO,
             default=default_categorias,
-            key='filtro_categoria',
+            key=f'filtro_categoria_{st.session_state.widget_key}',
             placeholder="Categoría"
         )
         
@@ -753,7 +766,7 @@ with header_col2:
             "Año",
             options=años_disponibles,
             index=años_disponibles.index(st.session_state.filtros_aplicados['año']) if st.session_state.filtros_aplicados['año'] in años_disponibles else 0,
-            key='filtro_año',
+            key=f'filtro_año_{st.session_state.widget_key}',
             placeholder="Año"
         )
     
@@ -772,7 +785,7 @@ with header_col2:
             options=meses_disponibles,
             format_func=lambda x: MESES[x],
             index=default_mes_index,
-            key='filtro_mes',
+            key=f'filtro_mes_{st.session_state.widget_key}',
             placeholder="Mes"
         )
     
@@ -788,7 +801,7 @@ with header_col2:
             "Día",
             options=dias_disponibles,
             default=default_dias,
-            key='filtro_dia',
+            key=f'filtro_dia_{st.session_state.widget_key}',
             placeholder="Día"
         )
         
@@ -798,9 +811,18 @@ with header_col2:
     
     with filtro_col5:
         if st.button("Limpiar Filtros", use_container_width=True):
-            # Limpiar completamente el session_state para volver al estado inicial
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
+            # Incrementar el widget_key para forzar recreación de todos los widgets
+            st.session_state.widget_key += 1
+            
+            # Resetear filtros a valores iniciales
+            todos_dias_reset = sorted(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]['Dia'].unique()) if len(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]) > 0 else []
+            
+            st.session_state.filtros_aplicados = {
+                'categoria': CATEGORIAS_GASTO.copy(),
+                'año': año_actual if año_actual in años_disponibles else años_disponibles[0],
+                'mes': mes_actual,
+                'dia': todos_dias_reset
+            }
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
