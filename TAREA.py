@@ -19,7 +19,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ================== HEADER ==================
-logo_url = "https://drive.google.com/uc?export=download&id=1RWV3aq1Nm2GKyi5_RFam0RAF_cR2v_iX"
+logo_url = "https://drive.google.com/file/d/1RWV3aq1Nm2GKyi5_RFam0RAF_cR2v_iX/view?usp=drive_link"
 
 col_logo, col_title = st.columns([1, 6])
 with col_logo:
