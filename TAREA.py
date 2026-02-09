@@ -100,15 +100,6 @@ st.markdown("""
         color: #333333 !important;
     }
     
-    /* Colores específicos para encabezados de tablas */
-    div[data-testid="stDataFrame"]:nth-of-type(1) .dataframe thead tr th {
-        background-color: #00C851 !important;
-    }
-    
-    div[data-testid="stDataFrame"]:nth-of-type(2) .dataframe thead tr th {
-        background-color: #4E54D4 !important;
-    }
-    
     .stSelectbox label, .stMultiSelect label {
         display: none !important;
     }
@@ -392,10 +383,6 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         mode = "gauge+number",
         value = gasto_total,
         domain = {'x': [0, 1], 'y': [0, 1]},
-        title = {
-            'text': "Cumplimiento del Presupuesto",
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']}
-        },
         gauge = {
             'axis': {
                 'range': [None, max_value],
@@ -430,11 +417,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         font={'color': COLORS['azul'], 'family': 'Roboto Condensed'},
         height=380,
         margin=dict(l=20, r=20, t=80, b=20),
-        dragmode=False
-    )
-    
-    # Título alineado a la izquierda
-    fig.update_layout(
+        dragmode=False,
         title={
             'text': "Cumplimiento del Presupuesto",
             'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
@@ -1070,12 +1053,15 @@ else:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"""
-        <h4 style="color: #00C851;">Gastos ({len(df_gastos_tabla)} registros)</h4>
+    st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
+    # Aplicar estilo CSS específico para esta tabla
+    st.markdown("""
         <style>
-        div[data-testid="column"]:nth-of-type(1) div[data-testid="stDataFrame"] .dataframe thead tr th {{
+        /* Tabla de Gastos - Encabezado Verde */
+        div[data-testid="column"]:nth-of-type(1) .stDataFrame table thead th {
             background-color: #00C851 !important;
-        }}
+            color: white !important;
+        }
         </style>
     """, unsafe_allow_html=True)
     st.dataframe(
@@ -1105,12 +1091,15 @@ with col1:
     )
 
 with col2:
-    st.markdown(f"""
-        <h4 style="color: #4E54D4;">Ingresos ({len(df_ingresos_tabla)} registros)</h4>
+    st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
+    # Aplicar estilo CSS específico para esta tabla
+    st.markdown("""
         <style>
-        div[data-testid="column"]:nth-of-type(2) div[data-testid="stDataFrame"] .dataframe thead tr th {{
+        /* Tabla de Ingresos - Encabezado Azul */
+        div[data-testid="column"]:nth-of-type(2) .stDataFrame table thead th {
             background-color: #4E54D4 !important;
-        }}
+            color: white !important;
+        }
         </style>
     """, unsafe_allow_html=True)
     st.dataframe(
