@@ -1048,85 +1048,109 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
-    # Aplicar estilo CSS específico para esta tabla con máxima especificidad
-    st.markdown("""
-        <style>
-        /* Tabla de Gastos - Encabezado Verde - Máxima especificidad */
-        div[data-testid="column"]:first-child div[data-testid="stDataFrame"] table thead th,
-        div[data-testid="column"]:first-child div[data-testid="stDataFrame"] thead th,
-        div[data-testid="column"]:first-child .stDataFrame table thead th,
-        div[data-testid="column"]:first-child .stDataFrame thead th {
-            background-color: #00C851 !important;
-            color: white !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    st.dataframe(
-        df_gastos_tabla,
-        use_container_width=True,
-        height=350,
-        hide_index=False,
-        column_config={
-            "Fecha": st.column_config.TextColumn(
-                "Fecha",
-                width="medium",
-            ),
-            "Descripción": st.column_config.TextColumn(
-                "Descripción",
-                width="medium",
-            ),
-            "Categoría": st.column_config.TextColumn(
-                "Categoría",
-                width="small",
-            ),
-            "Monto": st.column_config.NumberColumn(
-                "Monto",
-                format="$%.2f",
-                width="small",
-            ),
-        }
-    )
+    
+    # Aplicar estilos con Pandas Styler
+    def style_gastos(df):
+        return df.style.set_table_styles([
+            {'selector': 'thead th', 'props': [
+                ('background-color', '#00C851'),
+                ('color', 'white'),
+                ('font-weight', 'bold'),
+                ('padding', '8px')
+            ]},
+            {'selector': 'tbody td', 'props': [
+                ('background-color', '#FFFFFF'),
+                ('color', '#333333')
+            ]}
+        ])
+    
+    if len(df_gastos_tabla) > 0:
+        styled_gastos = style_gastos(df_gastos_tabla)
+        st.dataframe(
+            styled_gastos,
+            use_container_width=True,
+            height=350,
+            hide_index=False,
+            column_config={
+                "Fecha": st.column_config.TextColumn(
+                    "Fecha",
+                    width="medium",
+                ),
+                "Descripción": st.column_config.TextColumn(
+                    "Descripción",
+                    width="medium",
+                ),
+                "Categoría": st.column_config.TextColumn(
+                    "Categoría",
+                    width="small",
+                ),
+                "Monto": st.column_config.NumberColumn(
+                    "Monto",
+                    format="$%.2f",
+                    width="small",
+                ),
+            }
+        )
+    else:
+        st.dataframe(
+            df_gastos_tabla,
+            use_container_width=True,
+            height=350,
+            hide_index=False
+        )
 
 with col2:
     st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
-    # Aplicar estilo CSS específico para esta tabla con máxima especificidad
-    st.markdown("""
-        <style>
-        /* Tabla de Ingresos - Encabezado Azul - Máxima especificidad */
-        div[data-testid="column"]:last-child div[data-testid="stDataFrame"] table thead th,
-        div[data-testid="column"]:last-child div[data-testid="stDataFrame"] thead th,
-        div[data-testid="column"]:last-child .stDataFrame table thead th,
-        div[data-testid="column"]:last-child .stDataFrame thead th {
-            background-color: #4E54D4 !important;
-            color: white !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    st.dataframe(
-        df_ingresos_tabla,
-        use_container_width=True,
-        height=350,
-        hide_index=False,
-        column_config={
-            "Fecha": st.column_config.TextColumn(
-                "Fecha",
-                width="medium",
-            ),
-            "Descripción": st.column_config.TextColumn(
-                "Descripción",
-                width="medium",
-            ),
-            "Categoría": st.column_config.TextColumn(
-                "Categoría",
-                width="small",
-            ),
-            "Monto": st.column_config.NumberColumn(
-                "Monto",
-                format="$%.2f",
-                width="small",
-            ),
-        }
-    )
+    
+    # Aplicar estilos con Pandas Styler
+    def style_ingresos(df):
+        return df.style.set_table_styles([
+            {'selector': 'thead th', 'props': [
+                ('background-color', '#4E54D4'),
+                ('color', 'white'),
+                ('font-weight', 'bold'),
+                ('padding', '8px')
+            ]},
+            {'selector': 'tbody td', 'props': [
+                ('background-color', '#FFFFFF'),
+                ('color', '#333333')
+            ]}
+        ])
+    
+    if len(df_ingresos_tabla) > 0:
+        styled_ingresos = style_ingresos(df_ingresos_tabla)
+        st.dataframe(
+            styled_ingresos,
+            use_container_width=True,
+            height=350,
+            hide_index=False,
+            column_config={
+                "Fecha": st.column_config.TextColumn(
+                    "Fecha",
+                    width="medium",
+                ),
+                "Descripción": st.column_config.TextColumn(
+                    "Descripción",
+                    width="medium",
+                ),
+                "Categoría": st.column_config.TextColumn(
+                    "Categoría",
+                    width="small",
+                ),
+                "Monto": st.column_config.NumberColumn(
+                    "Monto",
+                    format="$%.2f",
+                    width="small",
+                ),
+            }
+        )
+    else:
+        st.dataframe(
+            df_ingresos_tabla,
+            use_container_width=True,
+            height=350,
+            hide_index=False
+        )
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
