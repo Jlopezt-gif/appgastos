@@ -38,7 +38,7 @@ st.markdown("""
     
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Roboto Condensed', sans-serif !important;
-        color: #0081FF;
+        color: #4E54D4;
     }
     
     .stMetric {
@@ -56,7 +56,7 @@ st.markdown("""
         font-family: 'Roboto Condensed', sans-serif !important;
         font-size: 14px !important;
         font-weight: 400 !important;
-        color: #0081FF !important;
+        color: #4E54D4 !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
@@ -100,7 +100,7 @@ st.markdown("""
     
     .stButton button {
         font-family: 'Roboto Condensed', sans-serif !important;
-        background-color: #0081FF;
+        background-color: #4E54D4;
         color: white;
         font-weight: 600;
         border-radius: 8px;
@@ -123,16 +123,16 @@ st.markdown("""
     }
     
     .header-box {
-        background-color: #FFFFFF;
-        padding: 15px 25px;
-        border-radius: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        background-color: transparent;
+        padding: 15px 0px;
+        border-radius: 0px;
+        margin-bottom: 0px;
+        box-shadow: none;
     }
     
     .titulo-principal {
-        color: #0081FF !important;
-        font-size: 14px !important;
+        color: #4E54D4 !important;
+        font-size: 24px !important;
         font-weight: 700 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
@@ -141,24 +141,24 @@ st.markdown("""
     
     .nombre-usuario {
         color: #666 !important;
-        font-size: 12px !important;
+        font-size: 14px !important;
         font-weight: 400 !important;
         margin: 5px 0 0 0 !important;
     }
     
     /* Forzar tamaño del h1 dentro de header-box */
     .header-box h1 {
-        font-size: 14px !important;
+        font-size: 24px !important;
     }
     
     .header-box p {
-        font-size: 12px !important;
+        font-size: 14px !important;
     }
     
     .mes-grande {
         font-size: 48px;
         font-weight: 400;
-        color: #0081FF;
+        color: #4E54D4;
         text-align: center;
         margin: 10px 0 15px 0;
         text-transform: uppercase;
@@ -231,10 +231,10 @@ st.markdown("""
 # COLORES DE LA MARCA
 # ============================================
 COLORS = {
-    'azul': '#0081FF',
-    'rosa': '#FF2E95',
-    'naranja': '#FF9D00',
-    'cian': '#00E5FF'
+    'azul': '#4E54D4',
+    'rosa': '#F72D93',
+    'naranja': '#FFA333',
+    'cian': '#00C1D4'
 }
 
 COLOR_PALETTE = [COLORS['azul'], COLORS['rosa'], COLORS['naranja'], COLORS['cian']]
@@ -756,16 +756,16 @@ header_col1, header_col2 = st.columns([2, 3])
 
 with header_col1:
     # Logo y Título juntos
-    logo_subcol, titulo_subcol = st.columns([1, 3])
+    logo_subcol, titulo_subcol = st.columns([1, 4])
     
     with logo_subcol:
-        logo = load_logo("https://drive.google.com/file/d/1qlZkn7u6xTgVmKu34U9i2mD_3XL7XF6N/view?usp=sharing")
+        logo = load_logo("https://drive.google.com/file/d/1GzKfHjH20FxY2MHT1mYDTb9S8n35TF6S/view?usp=sharing")
         if logo:
-            st.image(logo, width=100)
+            st.image(logo, width=80)
     
     with titulo_subcol:
         st.markdown(f"""
-            <div class="header-box" style="padding: 15px;">
+            <div class="header-box">
                 <h1 class="titulo-principal">CONTROL DE FINANZAS</h1>
                 <p class="nombre-usuario">{cliente_nombre}</p>
             </div>
@@ -963,7 +963,7 @@ with col4:
     # Crear métrica con HTML personalizado
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #4E54D4;">Presupuesto Disponible</label>
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
                 ${presupuesto_disponible:,.2f}
             </div>
@@ -1049,108 +1049,152 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
     
-    # Aplicar estilos con Pandas Styler
-    def style_gastos(df):
-        return df.style.set_table_styles([
-            {'selector': 'thead th', 'props': [
-                ('background-color', '#00C851'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '8px')
-            ]},
-            {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333')
-            ]}
-        ])
+    # Crear tabla HTML personalizada
+    html_gastos = """
+    <style>
+    .tabla-gastos {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 12px;
+        background-color: white;
+        max-height: 350px;
+        overflow-y: auto;
+        display: block;
+    }
+    .tabla-gastos thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .tabla-gastos thead th {
+        background-color: #00C851 !important;
+        color: white !important;
+        font-weight: 700;
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    .tabla-gastos tbody td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #333333;
+    }
+    .tabla-gastos tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+    </style>
+    <div style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+    <table class="tabla-gastos">
+        <thead>
+            <tr>
+                <th style="width: 50px;"></th>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
     
     if len(df_gastos_tabla) > 0:
-        styled_gastos = style_gastos(df_gastos_tabla)
-        st.dataframe(
-            styled_gastos,
-            use_container_width=True,
-            height=350,
-            hide_index=False,
-            column_config={
-                "Fecha": st.column_config.TextColumn(
-                    "Fecha",
-                    width="medium",
-                ),
-                "Descripción": st.column_config.TextColumn(
-                    "Descripción",
-                    width="medium",
-                ),
-                "Categoría": st.column_config.TextColumn(
-                    "Categoría",
-                    width="small",
-                ),
-                "Monto": st.column_config.NumberColumn(
-                    "Monto",
-                    format="$%.2f",
-                    width="small",
-                ),
-            }
-        )
+        for idx, row in df_gastos_tabla.iterrows():
+            html_gastos += f"""
+            <tr>
+                <td style="text-align: center;">{idx}</td>
+                <td>{row['Fecha']}</td>
+                <td>{row['Descripción']}</td>
+                <td>{row['Categoría']}</td>
+                <td>${row['Monto']:,.2f}</td>
+            </tr>
+            """
     else:
-        st.dataframe(
-            df_gastos_tabla,
-            use_container_width=True,
-            height=350,
-            hide_index=False
-        )
+        html_gastos += "<tr><td colspan='5' style='text-align: center;'>No hay datos</td></tr>"
+    
+    html_gastos += """
+        </tbody>
+    </table>
+    </div>
+    """
+    
+    st.markdown(html_gastos, unsafe_allow_html=True)
 
 with col2:
     st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
     
-    # Aplicar estilos con Pandas Styler
-    def style_ingresos(df):
-        return df.style.set_table_styles([
-            {'selector': 'thead th', 'props': [
-                ('background-color', '#0081FF'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '8px')
-            ]},
-            {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333')
-            ]}
-        ])
+    # Crear tabla HTML personalizada
+    html_ingresos = """
+    <style>
+    .tabla-ingresos {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 12px;
+        background-color: white;
+        max-height: 350px;
+        overflow-y: auto;
+        display: block;
+    }
+    .tabla-ingresos thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .tabla-ingresos thead th {
+        background-color: #4E54D4 !important;
+        color: white !important;
+        font-weight: 700;
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    .tabla-ingresos tbody td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #333333;
+    }
+    .tabla-ingresos tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+    </style>
+    <div style="max-height: 350px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;">
+    <table class="tabla-ingresos">
+        <thead>
+            <tr>
+                <th style="width: 50px;"></th>
+                <th>Fecha</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+    """
     
     if len(df_ingresos_tabla) > 0:
-        styled_ingresos = style_ingresos(df_ingresos_tabla)
-        st.dataframe(
-            styled_ingresos,
-            use_container_width=True,
-            height=350,
-            hide_index=False,
-            column_config={
-                "Fecha": st.column_config.TextColumn(
-                    "Fecha",
-                    width="medium",
-                ),
-                "Descripción": st.column_config.TextColumn(
-                    "Descripción",
-                    width="medium",
-                ),
-                "Categoría": st.column_config.TextColumn(
-                    "Categoría",
-                    width="small",
-                ),
-                "Monto": st.column_config.NumberColumn(
-                    "Monto",
-                    format="$%.2f",
-                    width="small",
-                ),
-            }
-        )
+        for idx, row in df_ingresos_tabla.iterrows():
+            html_ingresos += f"""
+            <tr>
+                <td style="text-align: center;">{idx}</td>
+                <td>{row['Fecha']}</td>
+                <td>{row['Descripción']}</td>
+                <td>{row['Categoría']}</td>
+                <td>${row['Monto']:,.2f}</td>
+            </tr>
+            """
     else:
-        st.dataframe(
-            df_ingresos_tabla,
-            use_container_width=True,
-            height=350,
-            hide_index=False
-        )
+        html_ingresos += "<tr><td colspan='5' style='text-align: center;'>No hay datos</td></tr>"
+    
+    html_ingresos += """
+        </tbody>
+    </table>
+    </div>
+    """
+    
+    st.markdown(html_ingresos, unsafe_allow_html=True)
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
