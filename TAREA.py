@@ -38,7 +38,7 @@ st.markdown("""
     
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Roboto Condensed', sans-serif !important;
-        color: #4E54D4;
+        color: #0081FF;
     }
     
     .stMetric {
@@ -56,7 +56,7 @@ st.markdown("""
         font-family: 'Roboto Condensed', sans-serif !important;
         font-size: 14px !important;
         font-weight: 400 !important;
-        color: #4E54D4 !important;
+        color: #0081FF !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
@@ -100,7 +100,7 @@ st.markdown("""
     
     .stButton button {
         font-family: 'Roboto Condensed', sans-serif !important;
-        background-color: #4E54D4;
+        background-color: #0081FF;
         color: white;
         font-weight: 600;
         border-radius: 8px;
@@ -131,7 +131,7 @@ st.markdown("""
     }
     
     .titulo-principal {
-        color: #4E54D4 !important;
+        color: #0081FF !important;
         font-size: 14px !important;
         font-weight: 700 !important;
         margin: 0 !important;
@@ -158,7 +158,7 @@ st.markdown("""
     .mes-grande {
         font-size: 48px;
         font-weight: 400;
-        color: #4E54D4;
+        color: #0081FF;
         text-align: center;
         margin: 10px 0 15px 0;
         text-transform: uppercase;
@@ -231,7 +231,7 @@ st.markdown("""
 # COLORES DE LA MARCA
 # ============================================
 COLORS = {
-    'azul': '#4E54D4',
+    'azul': '#0081FF',
     'rosa': '#F72D93',
     'naranja': '#FFA333',
     'cian': '#00C1D4'
@@ -963,7 +963,7 @@ with col4:
     # Crear métrica con HTML personalizado
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #4E54D4;">Presupuesto Disponible</label>
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
                 ${presupuesto_disponible:,.2f}
             </div>
@@ -1106,7 +1106,7 @@ with col2:
     def style_ingresos(df):
         return df.style.set_table_styles([
             {'selector': 'thead th', 'props': [
-                ('background-color', '#4E54D4'),
+                ('background-color', '#0081FF'),
                 ('color', 'white'),
                 ('font-weight', 'bold'),
                 ('padding', '8px')
