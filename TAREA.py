@@ -55,14 +55,14 @@ st.markdown("""
     .stMetric label {
         font-family: 'Roboto Condensed', sans-serif !important;
         font-size: 14px !important;
-        font-weight: 600 !important;
+        font-weight: 400 !important;
         color: #4E54D4 !important;
     }
     
     .stMetric [data-testid="stMetricValue"] {
         font-family: 'Roboto Condensed', sans-serif !important;
         font-size: 32px !important;
-        font-weight: 700 !important;
+        font-weight: 400 !important;
         margin-top: 8px !important;
     }
     
@@ -115,6 +115,13 @@ st.markdown("""
         padding: 10px 24px;
         transition: all 0.3s;
         width: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 14px !important;
+        min-height: 38px;
+        height: 38px;
+        max-height: 38px;
     }
     
     .stButton button:hover {
@@ -157,10 +164,10 @@ st.markdown("""
     
     .mes-grande {
         font-size: 48px;
-        font-weight: 700;
+        font-weight: 400;
         color: #4E54D4;
         text-align: center;
-        margin: 20px 0;
+        margin: 10px 0 15px 0;
         text-transform: uppercase;
     }
     
@@ -915,9 +922,9 @@ with col4:
     
     # Crear métrica con HTML personalizado
     st.markdown(f"""
-        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 600; color: #4E54D4;">Presupuesto Disponible</label>
-            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 700; color: {color_valor}; margin-top: 8px;">
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #4E54D4;">Presupuesto Disponible</label>
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
                 ${presupuesto_disponible:,.2f}
             </div>
         </div>
