@@ -89,12 +89,6 @@ st.markdown("""
         background-color: #FFFFFF !important;
     }
     
-    .dataframe thead tr th {
-        font-weight: 700 !important;
-        padding: 8px !important;
-        color: white !important;
-    }
-    
     .dataframe tbody tr td {
         background-color: #FFFFFF !important;
         color: #333333 !important;
@@ -1054,11 +1048,14 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
-    # Aplicar estilo CSS específico para esta tabla - TODA la fila de encabezado
+    # Aplicar estilo CSS específico para esta tabla con máxima especificidad
     st.markdown("""
         <style>
-        /* Tabla de Gastos - Encabezado Verde en toda la primera fila */
-        div[data-testid="column"]:nth-of-type(1) .stDataFrame thead th {
+        /* Tabla de Gastos - Encabezado Verde - Máxima especificidad */
+        div[data-testid="column"]:first-child div[data-testid="stDataFrame"] table thead th,
+        div[data-testid="column"]:first-child div[data-testid="stDataFrame"] thead th,
+        div[data-testid="column"]:first-child .stDataFrame table thead th,
+        div[data-testid="column"]:first-child .stDataFrame thead th {
             background-color: #00C851 !important;
             color: white !important;
         }
@@ -1092,11 +1089,14 @@ with col1:
 
 with col2:
     st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
-    # Aplicar estilo CSS específico para esta tabla - TODA la fila de encabezado
+    # Aplicar estilo CSS específico para esta tabla con máxima especificidad
     st.markdown("""
         <style>
-        /* Tabla de Ingresos - Encabezado Azul en toda la primera fila */
-        div[data-testid="column"]:nth-of-type(2) .stDataFrame thead th {
+        /* Tabla de Ingresos - Encabezado Azul - Máxima especificidad */
+        div[data-testid="column"]:last-child div[data-testid="stDataFrame"] table thead th,
+        div[data-testid="column"]:last-child div[data-testid="stDataFrame"] thead th,
+        div[data-testid="column"]:last-child .stDataFrame table thead th,
+        div[data-testid="column"]:last-child .stDataFrame thead th {
             background-color: #4E54D4 !important;
             color: white !important;
         }
