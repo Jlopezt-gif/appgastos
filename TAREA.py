@@ -782,10 +782,10 @@ with header_col1:
     with titulo_subcol:
         st.markdown(f"""
             <div style="padding: 0 0 0 8px; margin-top: 0;">
-                <h1 class="titulo-principal" style="margin: 0; font-size: 24px !important;">
+                <h1 class="titulo-principal" style="margin: 0 0 -6px 0;">
                     CONTROL DE FINANZAS
                 </h1>
-                <p class="nombre-usuario" style="margin: -4px 0 0 0;">
+                <p class="nombre-usuario" style="margin: 0;">
                     {cliente_nombre}
                 </p>
             </div>
