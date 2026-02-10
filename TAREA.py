@@ -247,10 +247,10 @@ div[data-testid="stImage"] {
 # COLORES DE LA MARCA
 # ============================================
 COLORS = {
-    'azul': '#4E54D4',
-    'rosa': '#F72D93',
-    'naranja': '#FFA333',
-    'cian': '#00C1D4'
+    'azul': '#0081FF',
+    'rosa': '#FF2E95',
+    'naranja': '#FF9D00',
+    'cian': '#00E5FF'
 }
 
 COLOR_PALETTE = [COLORS['azul'], COLORS['rosa'], COLORS['naranja'], COLORS['cian']]
