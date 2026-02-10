@@ -132,7 +132,7 @@ st.markdown("""
     
     .titulo-principal {
         color: #0081FF !important;
-        font-size: 18px !important;
+        font-size: 28px !important;
         font-weight: 700 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
@@ -143,7 +143,7 @@ st.markdown("""
         color: #666 !important;
         font-size: 12px !important;
         font-weight: 400 !important;
-        margin: -3px 0 0 0 !important;
+        margin: -5px 0 0 0 !important;
         padding: 0 !important;
         line-height: 1.2 !important;
     }
