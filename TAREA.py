@@ -132,7 +132,7 @@ st.markdown("""
     
     .titulo-principal {
         color: #0081FF !important;
-        font-size: 28px !important;
+        font-size: 18px !important;
         font-weight: 700 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
@@ -143,7 +143,9 @@ st.markdown("""
         color: #666 !important;
         font-size: 12px !important;
         font-weight: 400 !important;
-        margin: 5px 0 0 0 !important;
+        margin: -3px 0 0 0 !important;
+        padding: 0 !important;
+        line-height: 1.2 !important;
     }
     
     /* Forzar tamaño del h1 dentro de header-box */
@@ -782,16 +784,14 @@ with header_col1:
     with titulo_subcol:
         st.markdown(f"""
             <div style="padding: 0 0 0 8px; margin-top: 0;">
-                <h1 class="titulo-principal" style="margin: 0 0 -10px 0;">
+                <h1 class="titulo-principal" style="margin: 0 0 0 0; line-height: 1.1;">
                     CONTROL DE FINANZAS
                 </h1>
-                <p class="nombre-usuario" style="margin: 0;">
+                <p class="nombre-usuario" style="margin: -3px 0 0 0; padding: 0;">
                     {cliente_nombre}
                 </p>
             </div>
         """, unsafe_allow_html=True)
-
-
 
 with header_col2:
     # Filtros en la parte superior derecha
