@@ -761,7 +761,7 @@ with header_col1:
     with logo_subcol:
         logo = load_logo("https://drive.google.com/file/d/1Bt1zKrOtAL-nZWZlqWr3x4CdTkTHGbnA/view?usp=sharing")
         if logo:
-            st.image(logo, width=140)
+            st.image(logo, width=100)
     
     with titulo_subcol:
         st.markdown(f"""
