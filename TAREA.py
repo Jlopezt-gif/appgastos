@@ -752,7 +752,7 @@ except Exception as e:
 # ============================================
 # ENCABEZADO CON LOGO, TÍTULO Y FILTROS
 # ============================================
-header_col1, header_col2 = st.columns([1.5, 2.5])
+header_col1, header_col2 = st.columns([2, 3])
 
 with header_col1:
     # Logo y Título juntos
