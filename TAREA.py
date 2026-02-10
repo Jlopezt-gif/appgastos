@@ -756,12 +756,12 @@ header_col1, header_col2 = st.columns([1.5, 2.5])
 
 with header_col1:
     # Logo y Título juntos
-    logo_subcol, titulo_subcol = st.columns([1.5, 3])
+    logo_subcol, titulo_subcol = st.columns([1, 3])
     
     with logo_subcol:
         logo = load_logo("https://drive.google.com/file/d/1Bt1zKrOtAL-nZWZlqWr3x4CdTkTHGbnA/view?usp=sharing")
         if logo:
-            st.image(logo, width=100)
+            st.image(logo, width=150)
     
     with titulo_subcol:
         st.markdown(f"""
