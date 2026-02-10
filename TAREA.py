@@ -227,6 +227,22 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* Evitar que las imágenes se recorten */
+img {
+    max-height: none !important;
+    height: auto !important;
+    object-fit: contain !important;
+}
+
+/* Asegurar que el contenedor no recorte */
+div[data-testid="stImage"] {
+    overflow: visible !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # ============================================
 # COLORES DE LA MARCA
 # ============================================
@@ -761,7 +777,7 @@ with header_col1:
     with logo_subcol:
         logo = load_logo("https://drive.google.com/file/d/1Bt1zKrOtAL-nZWZlqWr3x4CdTkTHGbnA/view?usp=sharing")
         if logo:
-            st.image(logo, width=100)
+            st.image(logo, use_column_width=True)
     
     with titulo_subcol:
         st.markdown(f"""
