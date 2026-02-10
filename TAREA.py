@@ -132,7 +132,7 @@ st.markdown("""
     
     .titulo-principal {
         color: #4E54D4 !important;
-        font-size: 14px !important;
+        font-size: 18px !important;
         font-weight: 700 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
@@ -752,20 +752,20 @@ except Exception as e:
 # ============================================
 # ENCABEZADO CON LOGO, TÍTULO Y FILTROS
 # ============================================
-header_col1, header_col2 = st.columns([2, 3])
+header_col1, header_col2 = st.columns([1.5, 2.5])
 
 with header_col1:
     # Logo y Título juntos
     logo_subcol, titulo_subcol = st.columns([1, 3])
     
     with logo_subcol:
-        logo = load_logo("https://drive.google.com/file/d/1qlZkn7u6xTgVmKu34U9i2mD_3XL7XF6N/view?usp=sharing")
+        logo = load_logo("https://drive.google.com/file/d/1GzKfHjH20FxY2MHT1mYDTb9S8n35TF6S/view?usp=sharing")
         if logo:
             st.image(logo, width=100)
     
     with titulo_subcol:
         st.markdown(f"""
-            <div class="header-box" style="padding: 15px;">
+            <div style="padding: 15px;">
                 <h1 class="titulo-principal">CONTROL DE FINANZAS</h1>
                 <p class="nombre-usuario">{cliente_nombre}</p>
             </div>
