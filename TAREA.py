@@ -455,9 +455,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         grid_color = "#E0E0E0"
         axis_color = "#333333"
         bar_text_color = "white"
-    """
-    Crea el gráfico de barras horizontales por categoría
-    """
+
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
     
     if len(gastos) == 0:
