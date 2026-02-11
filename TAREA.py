@@ -448,7 +448,6 @@ def crear_barras_horizontales_categorias(df_filtrado):
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
     
     if len(gastos) == 0:
-        # Gráfico vacío
         fig = go.Figure()
         fig.add_annotation(
             text="No hay datos de gastos para mostrar",
@@ -456,34 +455,44 @@ def crear_barras_horizontales_categorias(df_filtrado):
             x=0.5, y=0.5, showarrow=False,
             font={'size': 16, 'family': 'Roboto Condensed', 'color': COLORS['azul']}
         )
-    else:
-        # Agrupar por categoría
-        por_categoria = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
-        
-        # Asignar colores cíclicamente
-        colors_list = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(len(por_categoria))]
-        
-        # Determinar posición del texto basado en el tamaño de la barra
-        max_valor = por_categoria.max()
-        text_positions = ['inside' if v > max_valor * 0.15 else 'outside' for v in por_categoria.values]
-        
-        fig = go.Figure()
-        
-        fig.add_trace(go.Bar(
-            y=por_categoria.index,
-            x=por_categoria.values,
-            orientation='h',
-            text=[f'${v:,.0f}' for v in por_categoria.values],
-            textposition=text_positions,
-            textfont={'family': 'Roboto Condensed', 'size': 13, 'color': 'white'},
-            insidetextanchor='middle',
-            marker=dict(
-                color=colors_list,
-                line=dict(color='white', width=2)
-            ),
-            hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
-        ))
-    
+        return fig
+
+    # Agrupar por categoría
+    por_categoria = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
+
+    # Colores
+    colors_list = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(len(por_categoria))]
+
+    max_valor = por_categoria.max()
+    text_positions = ['inside' if v > max_valor * 0.15 else 'outside' for v in por_categoria.values]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        y=por_categoria.index,
+        x=por_categoria.values,
+        orientation='h',
+
+        text=[f'${v:,.0f}' for v in por_categoria.values],
+        textposition=text_positions,
+        cliponaxis=False,
+
+        textfont=dict(
+            family='Roboto Condensed',
+            size=13,
+            color='white'
+        ),
+        texttemplate="<b>%{text}</b>",
+
+        marker=dict(
+            color=colors_list,
+            opacity=0.9,
+            line=dict(width=0)  # ❌ SIN BORDE
+        ),
+
+        hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
+    ))
+
     fig.update_layout(
         title={
             'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
@@ -495,41 +504,39 @@ def crear_barras_horizontales_categorias(df_filtrado):
                 'color': COLORS['azul']
             }
         },
-        xaxis_title='Monto ($)',
-        yaxis_title='',
-        font={'family': 'Roboto Condensed', 'color': '#1F2D3D'},
-    
-        # 👇 FONDO TRANSPARENTE
+
+        # ❌ Quitar título del eje X
+        xaxis_title=None,
+        yaxis_title=None,
+
+        font={'family': 'Roboto Condensed', 'color': '#E5E7EB'},
+
+        # 🪟 Fondo transparente (se adapta al tema)
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-    
+
         height=380,
-        margin=dict(l=150, r=80, t=80, b=60),
-    
+        margin=dict(l=150, r=120, t=80, b=40),
+
+        # 🧱 Grilla visible
         xaxis=dict(
-            gridcolor='#E5E7EB',
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#1F2D3D'},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': '#1F2D3D'},
+            showgrid=True,
+            gridcolor='rgba(255,255,255,0.15)',
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#1F2D3D'},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
             fixedrange=True
         ),
-    
-        # 👇 Para que los textos no desaparezcan si son muchos
+
         uniformtext=dict(minsize=10, mode='show'),
-    
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=13,
-            font_family="Roboto Condensed"
-        ),
+
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
-       
+
     return fig
 
 
