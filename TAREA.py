@@ -443,15 +443,15 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
 
 def crear_barras_horizontales_categorias(df_filtrado):
 
-    tema = st.get_option("theme.base")  # "light" o "dark"
-
     if tema == "dark":
         text_color = "#E5E7EB"      # claro
         grid_color = "rgba(255,255,255,0.15)"
+        axis_color = "#E5E7EB"
         bar_text_color = "white"
     else:
         text_color = "#333333"      # oscuro
         grid_color = "#E0E0E0"
+        axis_color = "#333333"
         bar_text_color = "white"    # dentro de barra siempre blanco
     """
     Crea el gráfico de barras horizontales por categoría
