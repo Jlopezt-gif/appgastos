@@ -504,35 +504,31 @@ def crear_barras_horizontales_categorias(df_filtrado):
                 'color': COLORS['azul']
             }
         },
-
-        # ❌ Quitar título del eje X
+    
         xaxis_title=None,
         yaxis_title=None,
-
+    
         font={'family': 'Roboto Condensed', 'color': '#E5E7EB'},
-
-        # 🪟 Fondo transparente (se adapta al tema)
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-
+    
+        # ✅ Fondo igual a los otros gráficos
+        paper_bgcolor='white',
+        plot_bgcolor='#F8F9FA',
+    
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
-
-        # 🧱 Grilla visible
+    
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.15)',
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
+            gridcolor='#E0E0E0',
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True
         ),
-
-        uniformtext=dict(minsize=10, mode='show'),
-
+    
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
