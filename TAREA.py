@@ -426,7 +426,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
             'x': 0,
             'xanchor': 'left',
             'font': {
-                'size': 16,
+                'size': 20,
                 'family': 'Roboto, Arial, sans-serif',
                 'color': COLORS['azul']
             }
