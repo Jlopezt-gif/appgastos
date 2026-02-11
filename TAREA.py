@@ -939,12 +939,23 @@ col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     # Mostrar mes como métrica
     st.markdown(f"""
-        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+        <div class="stMetric" style="
+            background-color: #FFFFFF;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 16px;
+        ">
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #0081FF; text-align: center;">
                 {MESES[mes_seleccionado].upper()}
             </div>
         </div>
     """, unsafe_allow_html=True)
+
 
 with col2:
     st.metric(
