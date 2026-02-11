@@ -19,7 +19,7 @@ st.markdown("""
 <style>
 /* Empuja todo el contenido hacia abajo para que no lo tape el header de Streamlit */
 .block-container {
-    padding-top: 4rem !important;
+    padding-top: 3rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
