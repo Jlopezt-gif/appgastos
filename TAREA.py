@@ -429,9 +429,9 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
                 'size': 16,
                 'family': 'Roboto, Arial, sans-serif',
                 'color': COLORS['azul']
+            }
         }
     )
-    
     # Configuración para móviles - desactivar interacciones
     fig.update_layout(
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
