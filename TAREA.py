@@ -422,12 +422,13 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         margin=dict(l=20, r=20, t=80, b=20),
         dragmode=False,
         title={
-            'text': "Cumplimiento del Presupuesto",
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'text': "<span style='font-weight:400'>Cumplimiento del Presupuesto</span>",
             'x': 0,
             'xanchor': 'left',
-            'y': 0.98,
-            'yanchor': 'top'
+            'font': {
+                'size': 16,
+                'family': 'Roboto, Arial, sans-serif',
+                'color': COLORS['azul']
         }
     )
     
