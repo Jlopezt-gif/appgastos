@@ -528,8 +528,8 @@ def crear_barras_horizontales_categorias(df_filtrado):
         font={'family': 'Roboto Condensed', 'color': text_color},
     
         # ✅ FONDO TIPO CARD (claro / oscuro automático)
-        paper_bgcolor=card_bg,
-        plot_bgcolor=card_bg,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
