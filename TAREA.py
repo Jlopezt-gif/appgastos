@@ -517,27 +517,35 @@ def crear_barras_horizontales_categorias(df_filtrado):
                 'color': COLORS['azul']
             }
         },
+    
         xaxis_title=None,
         yaxis_title=None,
-        font={'family': 'Roboto Condensed', 'color': text_color},
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+    
+        font={'family': 'Roboto Condensed', 'color': '#E5E7EB'},
+    
+        # ✅ Fondo igual a los otros gráficos
+        paper_bgcolor='white',
+        plot_bgcolor='#F8F9FA',
+    
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
+    
         xaxis=dict(
             showgrid=True,
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
+            gridcolor='#E0E0E0',
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True
         ),
+    
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
+
 
     return fig
 
