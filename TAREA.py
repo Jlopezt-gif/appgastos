@@ -497,19 +497,20 @@ def crear_barras_horizontales_categorias(df_filtrado):
         },
         xaxis_title='Monto ($)',
         yaxis_title='',
-        font={'family': 'Roboto Condensed'},
-        paper_bgcolor='white',
-        plot_bgcolor='#F8F9FA',
+        font={'family': 'Roboto Condensed', 'color': '#1F2D3D'},  # 👈 texto más oscuro
+        paper_bgcolor='white',     # 👈 fondo general blanco
+        plot_bgcolor='white',      # 👈 fondo del área del gráfico blanco
         height=380,
         margin=dict(l=150, r=80, t=80, b=60),
         xaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
+            gridcolor='#E5E7EB',    # 👈 grilla muy suave pero visible
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#1F2D3D'},
+            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': '#1F2D3D'},
+            fixedrange=True,
+            zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#1F2D3D'},
             fixedrange=True
         ),
         hoverlabel=dict(
@@ -521,6 +522,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
     
+        
     return fig
 
 
