@@ -493,6 +493,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
                 'size': 20,
                 'family': 'Roboto, Arial, sans-serif',
                 'color': COLORS['azul']
+            }
         },
         xaxis_title='Monto ($)',
         yaxis_title='',
@@ -521,6 +522,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     )
     
     return fig
+
 
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     """
