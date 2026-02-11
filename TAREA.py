@@ -519,16 +519,16 @@ def crear_barras_horizontales_categorias(df_filtrado):
     
         xaxis=dict(
             showgrid=True,
-            gridcolor='rgba(255,255,255,0.15)',
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
+            gridcolor='#E0E0E0',
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
             fixedrange=True
         ),
-    
+
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
