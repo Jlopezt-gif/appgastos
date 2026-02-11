@@ -450,11 +450,13 @@ def crear_barras_horizontales_categorias(df_filtrado):
         grid_color = "rgba(255,255,255,0.15)"
         axis_color = "#E5E7EB"
         bar_text_color = "white"
+        card_bg = "#1F2937"         # fondo tipo card oscuro
     else:
         text_color = "#333333"      # oscuro
         grid_color = "#E0E0E0"
         axis_color = "#333333"
         bar_text_color = "white"
+        card_bg = "#FFFFFF"         # fondo tipo card claro
 
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
     
@@ -465,6 +467,10 @@ def crear_barras_horizontales_categorias(df_filtrado):
             xref="paper", yref="paper",
             x=0.5, y=0.5, showarrow=False,
             font={'size': 16, 'family': 'Roboto Condensed', 'color': COLORS['azul']}
+        )
+        fig.update_layout(
+            paper_bgcolor=card_bg,
+            plot_bgcolor=card_bg
         )
         return fig
 
@@ -491,14 +497,14 @@ def crear_barras_horizontales_categorias(df_filtrado):
         textfont=dict(
             family='Roboto Condensed',
             size=13,
-            color='white'
+            color=bar_text_color
         ),
         texttemplate="<b>%{text}</b>",
 
         marker=dict(
             color=colors_list,
             opacity=0.9,
-            line=dict(width=0)  # ❌ SIN BORDE
+            line=dict(width=0)
         ),
 
         hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
@@ -521,9 +527,9 @@ def crear_barras_horizontales_categorias(df_filtrado):
     
         font={'family': 'Roboto Condensed', 'color': text_color},
     
-        # ✅ FONDO TRANSPARENTE (PC y celular)
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        # ✅ FONDO TIPO CARD (claro / oscuro automático)
+        paper_bgcolor=card_bg,
+        plot_bgcolor=card_bg,
     
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
@@ -545,6 +551,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     )
 
     return fig
+
 
 
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
