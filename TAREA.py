@@ -32,7 +32,7 @@ st.markdown("""
     }
     
     .block-container {
-        padding-top: 2rem;
+        padding-top: 0rem !important;
         padding-bottom: 2rem;
     }
     
@@ -122,12 +122,18 @@ st.markdown("""
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     
-    .header-box {
+    /* ======================================
+       HEADER WRAPPER - Fondo azul suave
+    ====================================== */
+    .header-wrapper {
         background-color: #F0F7FF;
-        padding: 15px 25px;
-        border-radius: 12px;
+        padding: 18px 25px 18px 25px;
         margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-left: -4rem;
+        margin-right: -4rem;
+        margin-top: -1rem;
+        box-shadow: 0 2px 8px rgba(0, 129, 255, 0.10);
+        border-bottom: 1.5px solid #C8DFFE;
     }
     
     .titulo-principal {
@@ -148,22 +154,19 @@ st.markdown("""
         line-height: 1.2 !important;
     }
     
-    /* Forzar tamaño del h1 dentro de header-box */
-    .header-box h1 {
-        font-size: 14px !important;
-    }
-    
-    .header-box p {
-        font-size: 12px !important;
-    }
-    
     /* Ajustes responsivos para móviles */
     @media (max-width: 768px) {
         .block-container {
-            padding-top: 1rem;
+            padding-top: 0rem !important;
             padding-bottom: 1rem;
             padding-left: 1rem;
             padding-right: 1rem;
+        }
+        
+        .header-wrapper {
+            margin-left: -1rem;
+            margin-right: -1rem;
+            padding: 12px 15px;
         }
         
         .stMetric {
@@ -196,9 +199,9 @@ st.markdown("""
             height: 120px;
         }
         
-        .header-box {
-            background-color: #2d3748 !important;
-            border: 1px solid #4A5568;
+        .header-wrapper {
+            background-color: #1a2a3a !important;
+            border-bottom: 1.5px solid #2d4a6a;
         }
         
         .titulo-principal {
@@ -273,11 +276,9 @@ def load_client_data(url):
     df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     
-    # Convertir Fecha a datetime
     if 'Fecha' in df.columns:
         df['Fecha'] = pd.to_datetime(df['Fecha'])
     
-    # Asegurar tipos numéricos
     if 'Monto' in df.columns:
         df['Monto'] = pd.to_numeric(df['Monto'], errors='coerce').fillna(0)
     if 'Año' in df.columns:
@@ -291,7 +292,6 @@ def load_client_data(url):
 
 def load_logo(url):
     try:
-        # Extraer el ID del archivo de Google Drive
         file_id = url.split('/d/')[1].split('/')[0]
         download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         response = requests.get(download_url)
@@ -304,23 +304,17 @@ def load_logo(url):
 # FUNCIONES DE CÁLCULO
 # ============================================
 def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
-    """
-    Calcula el presupuesto disponible del mes
-    """
-    # Filtrar presupuestos del mes
     presupuestos_mes = df[
         (df['Tipo'] == 'Presupuesto') & 
         (df['Año'] == año_filtro) & 
         (df['Mes'] == mes_filtro)
     ].sort_values('Fecha', ascending=False)
     
-    # Obtener el último presupuesto del mes
     if len(presupuestos_mes) > 0:
         ultimo_presupuesto = presupuestos_mes.iloc[0]['Monto']
     else:
         ultimo_presupuesto = 0
     
-    # Sumar todos los gastos del mes
     gastos_mes = df[
         (df['Tipo'] == 'Gasto') & 
         (df['Año'] == año_filtro) & 
@@ -332,9 +326,6 @@ def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
     return presupuesto_disponible, ultimo_presupuesto, gastos_mes
 
 def obtener_ultimo_presupuesto_mes(df, año, mes):
-    """
-    Obtiene el último presupuesto ingresado de un mes específico
-    """
     presupuestos = df[
         (df['Tipo'] == 'Presupuesto') & 
         (df['Año'] == año) & 
@@ -349,24 +340,18 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 # FUNCIONES DE GRÁFICOS
 # ============================================
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
-    """
-    Crea el gráfico de gauge para el cumplimiento del presupuesto
-    """
     gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
     
-    # Si no hay presupuesto, usar el gasto como máximo
     if presupuesto_mes == 0:
         max_value = gasto_total if gasto_total > 0 else 100
     else:
         max_value = presupuesto_mes
     
-    # Calcular porcentaje
     if presupuesto_mes > 0:
         porcentaje = (gasto_total / presupuesto_mes) * 100
     else:
         porcentaje = 0
     
-    # Determinar color según porcentaje
     if porcentaje <= 50:
         color = COLORS['cian']
     elif porcentaje <= 75:
@@ -415,16 +400,12 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         dragmode=False,
         title={
             'text': "Cumplimiento del Presupuesto",
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
             'x': 0,
             'xanchor': 'left',
             'y': 0.98,
             'yanchor': 'top'
-        }
-    )
-    
-    # Configuración para móviles - desactivar interacciones
-    fig.update_layout(
+        },
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
         xaxis={'fixedrange': True},
         yaxis={'fixedrange': True}
@@ -433,13 +414,9 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     return fig
 
 def crear_barras_horizontales_categorias(df_filtrado):
-    """
-    Crea el gráfico de barras horizontales por categoría
-    """
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
     
     if len(gastos) == 0:
-        # Gráfico vacío
         fig = go.Figure()
         fig.add_annotation(
             text="No hay datos de gastos para mostrar",
@@ -448,18 +425,12 @@ def crear_barras_horizontales_categorias(df_filtrado):
             font={'size': 16, 'family': 'Roboto Condensed', 'color': COLORS['azul']}
         )
     else:
-        # Agrupar por categoría
         por_categoria = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
-        
-        # Asignar colores cíclicamente
         colors_list = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(len(por_categoria))]
-        
-        # Determinar posición del texto basado en el tamaño de la barra
         max_valor = por_categoria.max()
         text_positions = ['inside' if v > max_valor * 0.15 else 'outside' for v in por_categoria.values]
         
         fig = go.Figure()
-        
         fig.add_trace(go.Bar(
             y=por_categoria.index,
             x=por_categoria.values,
@@ -468,17 +439,14 @@ def crear_barras_horizontales_categorias(df_filtrado):
             textposition=text_positions,
             textfont={'family': 'Roboto Condensed', 'size': 13, 'color': 'white'},
             insidetextanchor='middle',
-            marker=dict(
-                color=colors_list,
-                line=dict(color='white', width=2)
-            ),
+            marker=dict(color=colors_list, line=dict(color='white', width=2)),
             hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
         ))
     
     fig.update_layout(
         title={
             'text': 'Gastos por Categoría',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
             'x': 0,
             'xanchor': 'left'
         },
@@ -489,21 +457,10 @@ def crear_barras_horizontales_categorias(df_filtrado):
         plot_bgcolor='#F8F9FA',
         height=380,
         margin=dict(l=150, r=80, t=80, b=60),
-        xaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
-        ),
-        yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
-            fixedrange=True
-        ),
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=13,
-            font_family="Roboto Condensed"
-        ),
+        xaxis=dict(gridcolor='#E0E0E0', tickfont={'family': 'Roboto Condensed', 'size': 12},
+                   title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}, fixedrange=True),
+        yaxis=dict(tickfont={'family': 'Roboto Condensed', 'size': 12}, fixedrange=True),
+        hoverlabel=dict(bgcolor="white", font_size=13, font_family="Roboto Condensed"),
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
@@ -511,14 +468,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     return fig
 
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
-    """
-    Crea el gráfico de líneas comparando Presupuesto y Gasto mensual
-    (Este gráfico muestra TODOS los meses del año, sin filtro de mes)
-    """
-    # Filtrar solo por año
     df_año = df[df['Año'] == año_filtro].copy()
-    
-    # Preparar datos para todos los meses
     meses_numeros = list(range(1, 13))
     meses_nombres = [MESES[m] for m in meses_numeros]
     
@@ -526,85 +476,42 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     gastos = []
     
     for mes in meses_numeros:
-        # Presupuesto: último del mes
         presupuesto = obtener_ultimo_presupuesto_mes(df_año, año_filtro, mes)
         presupuestos.append(presupuesto)
-        
-        # Gasto: suma del mes
         gasto = df_año[(df_año['Tipo'] == 'Gasto') & (df_año['Mes'] == mes)]['Monto'].sum()
         gastos.append(gasto)
     
     fig = go.Figure()
     
-    # Línea de Presupuesto
     fig.add_trace(go.Scatter(
-        x=meses_nombres,
-        y=presupuestos,
-        mode='lines+markers+text',
-        name='Presupuesto',
-        line=dict(color=COLORS['azul'], width=3),
-        marker=dict(size=10, color=COLORS['azul']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
-        textposition='top center',
+        x=meses_nombres, y=presupuestos, mode='lines+markers+text', name='Presupuesto',
+        line=dict(color=COLORS['azul'], width=3), marker=dict(size=10, color=COLORS['azul']),
+        text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos], textposition='top center',
         textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Línea de Gasto
     fig.add_trace(go.Scatter(
-        x=meses_nombres,
-        y=gastos,
-        mode='lines+markers+text',
-        name='Gasto',
-        line=dict(color=COLORS['rosa'], width=3),
-        marker=dict(size=10, color=COLORS['rosa']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
-        textposition='top center',
+        x=meses_nombres, y=gastos, mode='lines+markers+text', name='Gasto',
+        line=dict(color=COLORS['rosa'], width=3), marker=dict(size=10, color=COLORS['rosa']),
+        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos], textposition='top center',
         textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['rosa']},
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
     ))
     
     fig.update_layout(
-        title={
-            'text': f'Análisis de Gasto y Presupuesto Mensual - {año_filtro}',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
-            'x': 0,
-            'xanchor': 'left'
-        },
-        xaxis_title='Mes',
-        yaxis_title='Monto ($)',
-        font={'family': 'Roboto Condensed'},
-        paper_bgcolor='white',
-        plot_bgcolor='#F8F9FA',
-        height=450,
-        margin=dict(l=80, r=40, t=100, b=60),
-        xaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 11},
-            tickangle=-45,
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
-        ),
-        yaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5,
-            font={'family': 'Roboto Condensed', 'size': 14}
-        ),
-        hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=13,
-            font_family="Roboto Condensed"
-        ),
+        title={'text': f'Análisis de Gasto y Presupuesto Mensual - {año_filtro}',
+               'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']}, 'x': 0, 'xanchor': 'left'},
+        xaxis_title='Mes', yaxis_title='Monto ($)',
+        font={'family': 'Roboto Condensed'}, paper_bgcolor='white', plot_bgcolor='#F8F9FA',
+        height=450, margin=dict(l=80, r=40, t=100, b=60),
+        xaxis=dict(gridcolor='#E0E0E0', tickfont={'family': 'Roboto Condensed', 'size': 11},
+                   tickangle=-45, title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}, fixedrange=True),
+        yaxis=dict(gridcolor='#E0E0E0', tickfont={'family': 'Roboto Condensed', 'size': 12},
+                   title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}, fixedrange=True),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5,
+                    font={'family': 'Roboto Condensed', 'size': 14}),
+        hovermode='x unified', hoverlabel=dict(bgcolor="white", font_size=13, font_family="Roboto Condensed"),
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
@@ -612,12 +519,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     return fig
 
 def crear_barras_ingreso_gasto_mensual(df, año_filtro):
-    """
-    Crea el gráfico de barras verticales comparando Ingresos y Gastos por mes
-    (Este gráfico muestra TODOS los meses del año)
-    """
     df_año = df[df['Año'] == año_filtro].copy()
-    
     meses_numeros = list(range(1, 13))
     meses_nombres = [MESES[m] for m in meses_numeros]
     
@@ -627,77 +529,38 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
     for mes in meses_numeros:
         ingreso = df_año[(df_año['Tipo'] == 'Ingreso') & (df_año['Mes'] == mes)]['Monto'].sum()
         ingresos.append(ingreso)
-        
         gasto = df_año[(df_año['Tipo'] == 'Gasto') & (df_año['Mes'] == mes)]['Monto'].sum()
         gastos.append(gasto)
     
     fig = go.Figure()
     
-    # Barras de Ingreso
     fig.add_trace(go.Bar(
-        x=meses_nombres,
-        y=ingresos,
-        name='Ingreso',
-        marker_color=COLORS['cian'],
-        text=[f'${v:,.0f}' if v > 0 else '' for v in ingresos],
-        textposition='outside',
+        x=meses_nombres, y=ingresos, name='Ingreso', marker_color=COLORS['cian'],
+        text=[f'${v:,.0f}' if v > 0 else '' for v in ingresos], textposition='outside',
         textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['cian']},
         hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'
     ))
     
-    # Barras de Gasto
     fig.add_trace(go.Bar(
-        x=meses_nombres,
-        y=gastos,
-        name='Gasto',
-        marker_color=COLORS['naranja'],
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
-        textposition='outside',
+        x=meses_nombres, y=gastos, name='Gasto', marker_color=COLORS['naranja'],
+        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos], textposition='outside',
         textfont={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['naranja']},
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
     ))
     
     fig.update_layout(
-        title={
-            'text': f'Ingresos vs Gastos Mensuales - {año_filtro}',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
-            'x': 0,
-            'xanchor': 'left'
-        },
-        xaxis_title='Mes',
-        yaxis_title='Monto ($)',
-        barmode='group',
-        font={'family': 'Roboto Condensed'},
-        paper_bgcolor='white',
-        plot_bgcolor='#F8F9FA',
-        height=450,
-        margin=dict(l=80, r=40, t=100, b=60),
-        xaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 11},
-            tickangle=-45,
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
-        ),
-        yaxis=dict(
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12},
-            title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']},
-            fixedrange=True
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5,
-            font={'family': 'Roboto Condensed', 'size': 14}
-        ),
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=13,
-            font_family="Roboto Condensed"
-        ),
+        title={'text': f'Ingresos vs Gastos Mensuales - {año_filtro}',
+               'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']}, 'x': 0, 'xanchor': 'left'},
+        xaxis_title='Mes', yaxis_title='Monto ($)', barmode='group',
+        font={'family': 'Roboto Condensed'}, paper_bgcolor='white', plot_bgcolor='#F8F9FA',
+        height=450, margin=dict(l=80, r=40, t=100, b=60),
+        xaxis=dict(gridcolor='#E0E0E0', tickfont={'family': 'Roboto Condensed', 'size': 11},
+                   tickangle=-45, title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}, fixedrange=True),
+        yaxis=dict(gridcolor='#E0E0E0', tickfont={'family': 'Roboto Condensed', 'size': 12},
+                   title_font={'family': 'Roboto Condensed', 'size': 14, 'color': COLORS['azul']}, fixedrange=True),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5,
+                    font={'family': 'Roboto Condensed', 'size': 14}),
+        hoverlabel=dict(bgcolor="white", font_size=13, font_family="Roboto Condensed"),
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
@@ -751,21 +614,11 @@ except Exception as e:
     st.stop()
 
 # ============================================
-# ENCABEZADO CON LOGO, TÍTULO Y FILTROS
+# ENCABEZADO CON FONDO #F0F7FF
 # ============================================
-st.markdown("""
-    <style>
-    .header-container {
-        background-color: #F0F7FF;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    </style>
-""", unsafe_allow_html=True)
 
-st.markdown('<div class="header-container">', unsafe_allow_html=True)
+# Abrir el div con la clase header-wrapper (fondo azul suave)
+st.markdown('<div class="header-wrapper">', unsafe_allow_html=True)
 
 header_col1, header_col2 = st.columns([2, 3])
 
@@ -791,7 +644,6 @@ with header_col1:
         """, unsafe_allow_html=True)
 
 with header_col2:
-    # Filtros en la parte superior derecha
     st.markdown('<div style="padding-top: 10px;">', unsafe_allow_html=True)
     
     # Obtener valores únicos para filtros
@@ -801,24 +653,21 @@ with header_col2:
     
     # Inicializar session_state para filtros si no existe
     if 'filtros_aplicados' not in st.session_state:
-        # Todos los días disponibles
         todos_dias = sorted(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]['Dia'].unique()) if len(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]) > 0 else []
         
         st.session_state.filtros_aplicados = {
-            'categoria': CATEGORIAS_GASTO.copy(),  # Todas las categorías por defecto
+            'categoria': CATEGORIAS_GASTO.copy(),
             'año': año_actual if año_actual in años_disponibles else años_disponibles[0],
             'mes': mes_actual,
-            'dia': todos_dias  # Todos los días por defecto
+            'dia': todos_dias
         }
     
-    # Key para resetear widgets
     if 'widget_key' not in st.session_state:
         st.session_state.widget_key = 0
     
     filtro_col1, filtro_col2, filtro_col3, filtro_col4, filtro_col5 = st.columns([2, 1.2, 1.2, 1.2, 1.3])
     
     with filtro_col1:
-        # Categorías: mostrar vacío cuando todas están seleccionadas
         default_categorias = [] if len(st.session_state.filtros_aplicados['categoria']) == len(CATEGORIAS_GASTO) else st.session_state.filtros_aplicados['categoria']
         
         categorias_seleccionadas = st.multiselect(
@@ -829,7 +678,6 @@ with header_col2:
             placeholder="Categoría"
         )
         
-        # Si está vacío, significa que todas están seleccionadas
         if not categorias_seleccionadas:
             categorias_seleccionadas = CATEGORIAS_GASTO.copy()
     
@@ -843,10 +691,8 @@ with header_col2:
         )
     
     with filtro_col3:
-        # Crear lista de meses disponibles en los datos
         meses_disponibles = sorted(df[df['Año'] == año_seleccionado]['Mes'].unique())
         
-        # Si el mes actual está en los datos, usarlo como default
         if mes_actual in meses_disponibles:
             default_mes_index = meses_disponibles.index(mes_actual)
         else:
@@ -862,11 +708,9 @@ with header_col2:
         )
     
     with filtro_col4:
-        # Obtener días disponibles según filtros de año y mes
         df_temp = df[(df['Año'] == año_seleccionado) & (df['Mes'] == mes_seleccionado)]
         dias_disponibles = sorted(df_temp['Dia'].unique()) if len(df_temp) > 0 else list(range(1, 32))
         
-        # Días: mostrar vacío cuando todos están seleccionados
         default_dias = [] if len(st.session_state.filtros_aplicados['dia']) == len(dias_disponibles) else [d for d in st.session_state.filtros_aplicados['dia'] if d in dias_disponibles]
         
         dias_seleccionados = st.multiselect(
@@ -877,16 +721,13 @@ with header_col2:
             placeholder="Día"
         )
         
-        # Si está vacío, significa que todos están seleccionados
         if not dias_seleccionados:
             dias_seleccionados = dias_disponibles.copy()
     
     with filtro_col5:
         if st.button("Limpiar Filtros", use_container_width=True):
-            # Incrementar el widget_key para forzar recreación de todos los widgets
             st.session_state.widget_key += 1
             
-            # Resetear filtros a valores iniciales
             todos_dias_reset = sorted(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]['Dia'].unique()) if len(df[(df['Año'] == año_actual) & (df['Mes'] == mes_actual)]) > 0 else []
             
             st.session_state.filtros_aplicados = {
@@ -899,7 +740,8 @@ with header_col2:
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('</div>', unsafe_allow_html=True)  # Cerrar header-container
+# Cerrar el div del header-wrapper
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Actualizar session_state
 st.session_state.filtros_aplicados = {
@@ -916,17 +758,14 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 df_filtrado = df.copy()
 
-# Filtro de año y mes (siempre activos)
 df_filtrado = df_filtrado[
     (df_filtrado['Año'] == año_seleccionado) & 
     (df_filtrado['Mes'] == mes_seleccionado)
 ]
 
-# Filtro de categoría (si hay selección específica)
 if categorias_seleccionadas and len(categorias_seleccionadas) < len(CATEGORIAS_GASTO):
     df_filtrado = df_filtrado[df_filtrado['Categoría'].isin(categorias_seleccionadas)]
 
-# Filtro de día (si hay selección específica)
 if dias_seleccionados and len(dias_seleccionados) < len(dias_disponibles):
     df_filtrado = df_filtrado[df_filtrado['Dia'].isin(dias_seleccionados)]
 
@@ -937,13 +776,9 @@ presupuesto_disponible, presupuesto_mes, gastos_mes = calcular_presupuesto_dispo
     df, año_seleccionado, mes_seleccionado
 )
 
-# Para los gráficos anuales (sin filtro de mes)
 df_año_completo = df[df['Año'] == año_seleccionado].copy()
 
-# Sumar ingresos totales del periodo filtrado
 ingresos_total = df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum()
-
-# Sumar gastos totales del periodo filtrado
 gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 
 # ============================================
@@ -953,7 +788,6 @@ gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
-    # Mostrar mes como métrica
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #0081FF; text-align: center;">
@@ -963,33 +797,22 @@ with col1:
     """, unsafe_allow_html=True)
 
 with col2:
-    st.metric(
-        label="Ingreso",
-        value=f"${ingresos_total:,.2f}"
-    )
+    st.metric(label="Ingreso", value=f"${ingresos_total:,.2f}")
 
 with col3:
-    st.metric(
-        label="Gasto",
-        value=f"${gastos_total:,.2f}"
-    )
+    st.metric(label="Gasto", value=f"${gastos_total:,.2f}")
 
 with col4:
-    st.metric(
-        label="Presupuesto",
-        value=f"${presupuesto_mes:,.2f}"
-    )
+    st.metric(label="Presupuesto", value=f"${presupuesto_mes:,.2f}")
 
 with col5:
-    # Determinar color según el presupuesto disponible
     if presupuesto_disponible <= 0:
-        color_valor = "#FF4444"  # Rojo
+        color_valor = "#FF4444"
     elif presupuesto_disponible <= 100:
-        color_valor = "#FFA333"  # Amarillo
+        color_valor = "#FFA333"
     else:
-        color_valor = "#00C851"  # Verde
+        color_valor = "#00C851"
     
-    # Crear métrica con HTML personalizado
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
             <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
@@ -1005,7 +828,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 # GRÁFICOS
 # ============================================
 
-# Fila 1: Gauge y Barras Horizontales
 col1, col2 = st.columns(2)
 
 with col1:
@@ -1018,7 +840,6 @@ with col2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Fila 2: Gráficos de líneas y barras (ANUALES - Sin filtro de mes)
 col1, col2 = st.columns(2)
 
 with col1:
@@ -1034,13 +855,11 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 # TABLAS DE GASTOS E INGRESOS
 # ============================================
-st.markdown("<h3 style='font-weight: 400;'>Detalle de Transacciones</h3>", unsafe_allow_html=True)
+st.markdown("### Detalle de Transacciones")
 
-# Preparar datos para tablas
 df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
 df_ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
 
-# Función para formatear fecha en español
 def formatear_fecha_espanol(fecha):
     meses_abrev = {
         1: 'Ene', 2: 'Feb', 3: 'Mar', 4: 'Abr',
@@ -1053,7 +872,6 @@ def formatear_fecha_espanol(fecha):
     hora = fecha.strftime('%H:%M:%S')
     return f"{dia} {mes} {año} {hora}"
 
-# Formatear tablas
 if len(df_gastos) > 0:
     df_gastos['Fecha_formato'] = df_gastos['Fecha'].apply(formatear_fecha_espanol)
     df_gastos_tabla = df_gastos[['Fecha_formato', 'Descripción', 'Categoría', 'Monto']].copy()
@@ -1072,114 +890,59 @@ if len(df_ingresos) > 0:
 else:
     df_ingresos_tabla = pd.DataFrame(columns=['Fecha', 'Descripción', 'Categoría', 'Monto'])
 
-# Mostrar tablas lado a lado
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"<h4 style='font-weight: 400;'>Gastos ({len(df_gastos_tabla)} registros)</h4>", unsafe_allow_html=True)
+    st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
     
-    # Aplicar estilos con Pandas Styler
     def style_gastos(df):
         return df.style.set_table_styles([
             {'selector': 'thead th', 'props': [
-                ('background-color', '#00C851'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '8px')
+                ('background-color', '#00C851'), ('color', 'white'),
+                ('font-weight', 'bold'), ('padding', '8px')
             ]},
             {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333')
+                ('background-color', '#FFFFFF'), ('color', '#333333')
             ]}
         ])
     
     if len(df_gastos_tabla) > 0:
         styled_gastos = style_gastos(df_gastos_tabla)
-        st.dataframe(
-            styled_gastos,
-            use_container_width=True,
-            height=350,
-            hide_index=False,
+        st.dataframe(styled_gastos, use_container_width=True, height=350, hide_index=False,
             column_config={
-                "Fecha": st.column_config.TextColumn(
-                    "Fecha",
-                    width="medium",
-                ),
-                "Descripción": st.column_config.TextColumn(
-                    "Descripción",
-                    width="medium",
-                ),
-                "Categoría": st.column_config.TextColumn(
-                    "Categoría",
-                    width="small",
-                ),
-                "Monto": st.column_config.NumberColumn(
-                    "Monto",
-                    format="$%.2f",
-                    width="small",
-                ),
-            }
-        )
+                "Fecha": st.column_config.TextColumn("Fecha", width="medium"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
+                "Categoría": st.column_config.TextColumn("Categoría", width="small"),
+                "Monto": st.column_config.NumberColumn("Monto", format="$%.2f", width="small"),
+            })
     else:
-        st.dataframe(
-            df_gastos_tabla,
-            use_container_width=True,
-            height=350,
-            hide_index=False
-        )
+        st.dataframe(df_gastos_tabla, use_container_width=True, height=350, hide_index=False)
 
 with col2:
-    st.markdown(f"<h4 style='font-weight: 400;'>Ingresos ({len(df_ingresos_tabla)} registros)</h4>", unsafe_allow_html=True)
+    st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
     
-    # Aplicar estilos con Pandas Styler
     def style_ingresos(df):
         return df.style.set_table_styles([
             {'selector': 'thead th', 'props': [
-                ('background-color', '#0081FF'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '8px')
+                ('background-color', '#0081FF'), ('color', 'white'),
+                ('font-weight', 'bold'), ('padding', '8px')
             ]},
             {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333')
+                ('background-color', '#FFFFFF'), ('color', '#333333')
             ]}
         ])
     
     if len(df_ingresos_tabla) > 0:
         styled_ingresos = style_ingresos(df_ingresos_tabla)
-        st.dataframe(
-            styled_ingresos,
-            use_container_width=True,
-            height=350,
-            hide_index=False,
+        st.dataframe(styled_ingresos, use_container_width=True, height=350, hide_index=False,
             column_config={
-                "Fecha": st.column_config.TextColumn(
-                    "Fecha",
-                    width="medium",
-                ),
-                "Descripción": st.column_config.TextColumn(
-                    "Descripción",
-                    width="medium",
-                ),
-                "Categoría": st.column_config.TextColumn(
-                    "Categoría",
-                    width="small",
-                ),
-                "Monto": st.column_config.NumberColumn(
-                    "Monto",
-                    format="$%.2f",
-                    width="small",
-                ),
-            }
-        )
+                "Fecha": st.column_config.TextColumn("Fecha", width="medium"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
+                "Categoría": st.column_config.TextColumn("Categoría", width="small"),
+                "Monto": st.column_config.NumberColumn("Monto", format="$%.2f", width="small"),
+            })
     else:
-        st.dataframe(
-            df_ingresos_tabla,
-            use_container_width=True,
-            height=350,
-            hide_index=False
-        )
+        st.dataframe(df_ingresos_tabla, use_container_width=True, height=350, hide_index=False)
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
