@@ -442,6 +442,17 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     return fig
 
 def crear_barras_horizontales_categorias(df_filtrado):
+
+    tema = st.get_option("theme.base")  # "light" o "dark"
+
+    if tema == "dark":
+        text_color = "#E5E7EB"      # claro
+        grid_color = "rgba(255,255,255,0.15)"
+        bar_text_color = "white"
+    else:
+        text_color = "#333333"      # oscuro
+        grid_color = "#E0E0E0"
+        bar_text_color = "white"    # dentro de barra siempre blanco
     """
     Crea el gráfico de barras horizontales por categoría
     """
@@ -508,7 +519,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         xaxis_title=None,
         yaxis_title=None,
     
-        font={'family': 'Roboto Condensed', 'color': '#E5E7EB'},
+        font={'family': 'Roboto Condensed', 'color': text_color},
     
         # ✅ Fondo igual a los otros gráficos
         paper_bgcolor='rgba(0,0,0,0)',
@@ -519,13 +530,13 @@ def crear_barras_horizontales_categorias(df_filtrado):
     
         xaxis=dict(
             showgrid=True,
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
+            gridcolor=grid_color,
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
             fixedrange=True
         ),
 
