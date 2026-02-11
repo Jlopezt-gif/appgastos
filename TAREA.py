@@ -504,7 +504,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
     ))
 
-       fig.update_layout(
+     fig.update_layout(
         title={
             'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
             'x': 0,
@@ -515,18 +515,13 @@ def crear_barras_horizontales_categorias(df_filtrado):
                 'color': COLORS['azul']
             }
         },
-    
         xaxis_title=None,
         yaxis_title=None,
-    
         font={'family': 'Roboto Condensed', 'color': text_color},
-    
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-    
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
-    
         xaxis=dict(
             showgrid=True,
             gridcolor=grid_color,
@@ -538,11 +533,9 @@ def crear_barras_horizontales_categorias(df_filtrado):
             tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
             fixedrange=True
         ),
-    
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
     )
-
 
     return fig
 
