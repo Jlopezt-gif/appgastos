@@ -123,9 +123,9 @@ st.markdown("""
     }
     
     .header-box {
-        background-color: #FFFFFF;
+        background-color: #F0F7FF;
         padding: 15px 25px;
-        border-radius: 15px;
+        border-radius: 12px;
         margin-bottom: 20px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
@@ -415,7 +415,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         dragmode=False,
         title={
             'text': "Cumplimiento del Presupuesto",
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
             'x': 0,
             'xanchor': 'left',
             'y': 0.98,
@@ -478,7 +478,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     fig.update_layout(
         title={
             'text': 'Gastos por Categoría',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
             'x': 0,
             'xanchor': 'left'
         },
@@ -567,7 +567,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     fig.update_layout(
         title={
             'text': f'Análisis de Gasto y Presupuesto Mensual - {año_filtro}',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
             'x': 0,
             'xanchor': 'left'
         },
@@ -660,7 +660,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
     fig.update_layout(
         title={
             'text': f'Ingresos vs Gastos Mensuales - {año_filtro}',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul'], 'weight': 'normal'},
             'x': 0,
             'xanchor': 'left'
         },
@@ -753,6 +753,20 @@ except Exception as e:
 # ============================================
 # ENCABEZADO CON LOGO, TÍTULO Y FILTROS
 # ============================================
+st.markdown("""
+    <style>
+    .header-container {
+        background-color: #F0F7FF;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="header-container">', unsafe_allow_html=True)
+
 header_col1, header_col2 = st.columns([2, 3])
 
 with header_col1:
@@ -884,6 +898,8 @@ with header_col2:
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)  # Cerrar header-container
 
 # Actualizar session_state
 st.session_state.filtros_aplicados = {
@@ -1018,7 +1034,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 # TABLAS DE GASTOS E INGRESOS
 # ============================================
-st.markdown("### Detalle de Transacciones")
+st.markdown("<h3 style='font-weight: 400;'>Detalle de Transacciones</h3>", unsafe_allow_html=True)
 
 # Preparar datos para tablas
 df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
@@ -1060,7 +1076,7 @@ else:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"#### Gastos ({len(df_gastos_tabla)} registros)")
+    st.markdown(f"<h4 style='font-weight: 400;'>Gastos ({len(df_gastos_tabla)} registros)</h4>", unsafe_allow_html=True)
     
     # Aplicar estilos con Pandas Styler
     def style_gastos(df):
@@ -1113,7 +1129,7 @@ with col1:
         )
 
 with col2:
-    st.markdown(f"#### Ingresos ({len(df_ingresos_tabla)} registros)")
+    st.markdown(f"<h4 style='font-weight: 400;'>Ingresos ({len(df_ingresos_tabla)} registros)</h4>", unsafe_allow_html=True)
     
     # Aplicar estilos con Pandas Styler
     def style_ingresos(df):
