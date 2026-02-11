@@ -785,40 +785,59 @@ gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 # MÉTRICAS PRINCIPALES CON MES
 # ============================================
 
+# Determinar color del presupuesto disponible
+if presupuesto_disponible <= 0:
+    color_disponible = "#FF4444"
+elif presupuesto_disponible <= 100:
+    color_disponible = "#FFA333"
+else:
+    color_disponible = "#00C851"
+
+CARD_STYLE = "background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;"
+LABEL_STYLE = "font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF; margin-bottom: 6px;"
+VALUE_STYLE = "font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #333333; margin-top: 8px;"
+
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
     st.markdown(f"""
-        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #0081FF; text-align: center;">
+        <div style="{CARD_STYLE} align-items: center;">
+            <div style="{LABEL_STYLE} text-align: center;">Mes</div>
+            <div style="{VALUE_STYLE} color: #0081FF; font-weight: 700; text-align: center;">
                 {MESES[mes_seleccionado].upper()}
             </div>
         </div>
     """, unsafe_allow_html=True)
 
 with col2:
-    st.metric(label="Ingreso", value=f"${ingresos_total:,.2f}")
+    st.markdown(f"""
+        <div style="{CARD_STYLE}">
+            <div style="{LABEL_STYLE}">Ingreso</div>
+            <div style="{VALUE_STYLE}">${ingresos_total:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col3:
-    st.metric(label="Gasto", value=f"${gastos_total:,.2f}")
+    st.markdown(f"""
+        <div style="{CARD_STYLE}">
+            <div style="{LABEL_STYLE}">Gasto</div>
+            <div style="{VALUE_STYLE}">${gastos_total:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col4:
-    st.metric(label="Presupuesto", value=f"${presupuesto_mes:,.2f}")
+    st.markdown(f"""
+        <div style="{CARD_STYLE}">
+            <div style="{LABEL_STYLE}">Presupuesto</div>
+            <div style="{VALUE_STYLE}">${presupuesto_mes:,.2f}</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col5:
-    if presupuesto_disponible <= 0:
-        color_valor = "#FF4444"
-    elif presupuesto_disponible <= 100:
-        color_valor = "#FFA333"
-    else:
-        color_valor = "#00C851"
-    
     st.markdown(f"""
-        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
-            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
-                ${presupuesto_disponible:,.2f}
-            </div>
+        <div style="{CARD_STYLE}">
+            <div style="{LABEL_STYLE}">Presupuesto Disponible</div>
+            <div style="{VALUE_STYLE} color: {color_disponible};">${presupuesto_disponible:,.2f}</div>
         </div>
     """, unsafe_allow_html=True)
 
