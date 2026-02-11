@@ -504,7 +504,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
     ))
 
-     fig.update_layout(
+    fig.update_layout(
         title={
             'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
             'x': 0,
