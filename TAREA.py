@@ -511,21 +511,21 @@ def crear_barras_horizontales_categorias(df_filtrado):
         font={'family': 'Roboto Condensed', 'color': '#E5E7EB'},
     
         # ✅ Fondo igual a los otros gráficos
-        paper_bgcolor='white',
-        plot_bgcolor='#F8F9FA',
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
     
         height=380,
         margin=dict(l=150, r=120, t=80, b=40),
     
         xaxis=dict(
             showgrid=True,
-            gridcolor='#E0E0E0',
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
+            gridcolor='rgba(255,255,255,0.15)',
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
             fixedrange=True,
             zeroline=False
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#333333'},
+            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': '#E5E7EB'},
             fixedrange=True
         ),
     
