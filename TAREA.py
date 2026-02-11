@@ -15,6 +15,14 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+st.markdown("""
+<style>
+/* Empuja todo el contenido hacia abajo para que no lo tape el header de Streamlit */
+.block-container {
+    padding-top: 4rem !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ============================================
 # ESTILOS CSS PERSONALIZADOS
