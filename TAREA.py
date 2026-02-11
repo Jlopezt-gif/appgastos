@@ -486,10 +486,13 @@ def crear_barras_horizontales_categorias(df_filtrado):
     
     fig.update_layout(
         title={
-            'text': 'Gastos por Categoría',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': COLORS['azul']},
+            'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
             'x': 0,
-            'xanchor': 'left'
+            'xanchor': 'left',
+            'font': {
+                'size': 20,
+                'family': 'Roboto, Arial, sans-serif',
+                'color': COLORS['azul']
         },
         xaxis_title='Monto ($)',
         yaxis_title='',
