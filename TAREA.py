@@ -157,15 +157,6 @@ st.markdown("""
         font-size: 12px !important;
     }
     
-    .mes-grande {
-        font-size: 48px;
-        font-weight: 400;
-        color: #0081FF;
-        text-align: center;
-        margin: 10px 0 15px 0;
-        text-transform: uppercase;
-    }
-    
     /* Ajustes responsivos para móviles */
     @media (max-width: 768px) {
         .block-container {
@@ -173,10 +164,6 @@ st.markdown("""
             padding-bottom: 1rem;
             padding-left: 1rem;
             padding-right: 1rem;
-        }
-        
-        .mes-grande {
-            font-size: 32px;
         }
         
         .stMetric {
@@ -196,10 +183,6 @@ st.markdown("""
         }
         
         h1, h2, h3, h4, h5, h6 {
-            color: #FFFFFF !important;
-        }
-        
-        .mes-grande {
             color: #FFFFFF !important;
         }
         
@@ -948,32 +931,40 @@ ingresos_total = df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum()
 gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 
 # ============================================
-# MES GRANDE Y MÉTRICAS PRINCIPALES
+# MÉTRICAS PRINCIPALES CON MES
 # ============================================
-# Mostrar mes grande
-st.markdown(f'<div class="mes-grande">{MESES[mes_seleccionado]}</div>', unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
+    # Mostrar mes como métrica
+    st.markdown(f"""
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #0081FF; text-align: center;">
+                {MESES[mes_seleccionado].upper()}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col2:
     st.metric(
         label="Ingreso",
         value=f"${ingresos_total:,.2f}"
     )
 
-with col2:
+with col3:
     st.metric(
         label="Gasto",
         value=f"${gastos_total:,.2f}"
     )
 
-with col3:
+with col4:
     st.metric(
         label="Presupuesto",
         value=f"${presupuesto_mes:,.2f}"
     )
 
-with col4:
+with col5:
     # Determinar color según el presupuesto disponible
     if presupuesto_disponible <= 0:
         color_valor = "#FF4444"  # Rojo
