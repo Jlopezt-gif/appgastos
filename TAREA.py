@@ -973,7 +973,7 @@ with col1:
             margin-bottom: 16px;
         ">
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #0081FF; text-align: center;">
-                {MESES[mes_seleccionado].UPPER()}
+                {MESES[mes_seleccionado].upper()}
             </div>
         </div>
     """, unsafe_allow_html=True)
