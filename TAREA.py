@@ -527,7 +527,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=3, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['azul']),   # ← color azul
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
     fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
@@ -536,7 +536,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=3, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['rosa']),   # ← color rosa
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
@@ -544,7 +544,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=42, r=8, t=26, b=42),
+        margin=dict(l=42, r=8, t=26, b=62),   # ← b de 42 → 62
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
