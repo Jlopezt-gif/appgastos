@@ -927,11 +927,8 @@ def formatear_fecha_espanol(fecha):
         5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Ago',
         9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
     }
-    dia = fecha.day
-    mes = meses_abrev[fecha.month]
-    año = fecha.year
-    hora = fecha.strftime('%H:%M:%S')
-    return f"{dia} {mes} {año} {hora}"
+    # Formato compacto: "15 Ene 26 14:30" — sin segundos, año en 2 dígitos
+    return f"{fecha.day} {meses_abrev[fecha.month]} {str(fecha.year)[-2:]} {fecha.strftime('%H:%M')}"
 
 if len(df_gastos) > 0:
     df_gastos['Fecha_formato'] = df_gastos['Fecha'].apply(formatear_fecha_espanol)
@@ -978,17 +975,17 @@ with col1:
         st.dataframe(
             styled_gastos,
             use_container_width=True,
-            height=350,
+            height=250,
             hide_index=False,
             column_config={
-                "Fecha": st.column_config.TextColumn("Fecha", width="small"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
-                "Categoría": st.column_config.TextColumn("Categoría", width="small"),
-                "Monto": st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
+                "Fecha":       st.column_config.TextColumn("Fecha",       width="medium"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="small"),
+                "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
+                "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
             }
         )
     else:
-        st.dataframe(df_gastos_tabla, use_container_width=True, height=350, hide_index=False)
+        st.dataframe(df_gastos_tabla, use_container_width=True, height=250, hide_index=False)
 
 with col2:
     chart_title("Detalle Ingresos")
@@ -1015,17 +1012,17 @@ with col2:
         st.dataframe(
             styled_ingresos,
             use_container_width=True,
-            height=350,
+            height=250,
             hide_index=False,
             column_config={
-                "Fecha": st.column_config.TextColumn("Fecha", width="small"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
-                "Categoría": st.column_config.TextColumn("Categoría", width="small"),
-                "Monto": st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
+                "Fecha":       st.column_config.TextColumn("Fecha",       width="medium"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="small"),
+                "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
+                "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
             }
         )
     else:
-        st.dataframe(df_ingresos_tabla, use_container_width=True, height=350, hide_index=False)
+        st.dataframe(df_ingresos_tabla, use_container_width=True, height=250, hide_index=False)
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
