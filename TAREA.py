@@ -170,12 +170,16 @@ st.markdown("""
         background-color: #FFFFFF;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        padding: 12px 12px 4px 12px;
-        margin-bottom: 16px;
+        padding: 8px 8px 4px 8px;
+        margin-bottom: 4px;
     }
     /* Eliminar el fondo blanco interno que Plotly agrega al iframe/svg */
     div[data-testid="stPlotlyChart"] > div {
         background: transparent !important;
+    }
+    /* Evitar que el párrafo del título tenga margin extra arriba */
+    div[data-testid="stMarkdownContainer"] > p {
+        margin-bottom: 2px !important;
     }
 
     /* Ajustes responsivos para móviles */
@@ -236,7 +240,7 @@ st.markdown("""
         }
 
         div[data-testid="stPlotlyChart"] {
-            background-color: #2d3748 !important;
+            background-color: #1e2530 !important;
             border: 1px solid #4A5568;
         }
     }
@@ -372,12 +376,10 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     
     if tema == "dark":
         text_color = "#FFFFFF"
-        title_color = "#FFFFFF"
         number_color = "#FFFFFF"
     else:
         text_color = "#333333"
-        title_color = COLORS['azul']
-        number_color = COLORS['azul']
+        number_color = "#333333"
     
     gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
     
@@ -401,7 +403,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     fig = go.Figure(go.Indicator(
         mode = "gauge+number",
         value = gasto_total,
-        domain = {'x': [0.05, 0.95], 'y': [0.05, 0.95]},
+        domain = {'x': [0.05, 0.95], 'y': [0.0, 1.0]},
         gauge = {
             'axis': {
                 'range': [None, max_value],
@@ -427,7 +429,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         number = {
             'font': {'family': 'Roboto Condensed', 'size': 32, 'color': number_color},
             'prefix': "$",
-            'suffix': f"<br><span style='font-size:14px; color:{text_color}'>Objetivo: ${presupuesto_mes:,.0f}</span>"
+            'suffix': f"<br><span style='font-size:13px; color:{text_color}'>Objetivo: ${presupuesto_mes:,.0f}</span>"
         }
     ))
     
@@ -436,14 +438,8 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': text_color, 'family': 'Roboto Condensed'},
         height=320,
-        margin=dict(l=10, r=10, t=50, b=10),
+        margin=dict(l=10, r=10, t=10, b=10),
         dragmode=False,
-        title={
-            'text': "<span style='font-weight:400'>Cumplimiento del Presupuesto</span>",
-            'x': 0,
-            'xanchor': 'left',
-            'font': {'size': 16, 'family': 'Roboto Condensed', 'color': title_color}
-        },
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
     )
     
@@ -457,13 +453,11 @@ def crear_barras_horizontales_categorias(df_filtrado):
         grid_color = "rgba(255,255,255,0.15)"
         axis_color = "#FFFFFF"
         bar_text_color = "white"
-        title_color = "#FFFFFF"
     else:
         text_color = "#333333"
         grid_color = "#E0E0E0"
         axis_color = "#333333"
         bar_text_color = "white"
-        title_color = COLORS['azul']
 
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
     
@@ -473,21 +467,18 @@ def crear_barras_horizontales_categorias(df_filtrado):
             text="No hay datos de gastos para mostrar",
             xref="paper", yref="paper",
             x=0.5, y=0.5, showarrow=False,
-            font={'size': 16, 'family': 'Roboto Condensed', 'color': title_color}
+            font={'size': 14, 'family': 'Roboto Condensed', 'color': text_color}
         )
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             height=320,
-            margin=dict(l=10, r=10, t=50, b=10),
+            margin=dict(l=10, r=10, t=10, b=10),
         )
         return fig
 
     por_categoria = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
     n_cats = len(por_categoria)
-    # Altura dinámica: 30px por categoría + espacio para título y eje
-    altura = max(280, min(n_cats * 32 + 100, 480))
-
     colors_list = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(n_cats)]
     max_valor = por_categoria.max()
     text_positions = ['inside' if v > max_valor * 0.15 else 'outside' for v in por_categoria.values]
@@ -501,35 +492,29 @@ def crear_barras_horizontales_categorias(df_filtrado):
         text=[f'${v:,.0f}' for v in por_categoria.values],
         textposition=text_positions,
         cliponaxis=False,
-        textfont=dict(family='Roboto Condensed', size=12, color=bar_text_color),
+        textfont=dict(family='Roboto Condensed', size=11, color=bar_text_color),
         texttemplate="<b>%{text}</b>",
         marker=dict(color=colors_list, opacity=0.9, line=dict(width=0)),
         hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
     ))
 
     fig.update_layout(
-        title={
-            'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
-            'x': 0,
-            'xanchor': 'left',
-            'font': {'size': 16, 'family': 'Roboto Condensed', 'color': title_color}
-        },
         xaxis_title=None,
         yaxis_title=None,
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=altura,
-        margin=dict(l=120, r=80, t=50, b=30),
+        height=320,
+        margin=dict(l=110, r=70, t=10, b=30),
         xaxis=dict(
             showgrid=True,
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': axis_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': axis_color},
             fixedrange=True,
             zeroline=False,
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 12, 'color': axis_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': axis_color},
             fixedrange=True,
         ),
         dragmode=False,
@@ -542,13 +527,11 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     tema = st.get_option("theme.base")
     
     if tema == "dark":
-        text_color = "#E5E7EB"
+        text_color = "#FFFFFF"
         grid_color = "rgba(255,255,255,0.15)"
-        title_color = "#FFFFFF"
     else:
         text_color = "#333333"
         grid_color = "#E0E0E0"
-        title_color = COLORS['azul']
     
     df_año = df[df['Año'] == año_filtro].copy()
     
@@ -566,52 +549,38 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         gastos.append(gasto)
     
     max_valor = max(max(presupuestos), max(gastos)) if max(presupuestos) > 0 or max(gastos) > 0 else 100
-    y_max = max_valor * 1.15
+    y_max = max_valor * 1.25
     
     fig = go.Figure()
     
     fig.add_trace(go.Scatter(
         x=meses_nombres,
         y=presupuestos,
-        mode='lines+markers+text',
+        mode='lines+markers',
         name='Presupuesto',
-        line=dict(color=COLORS['azul'], width=3),
-        marker=dict(size=10, color=COLORS['azul']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
-        textposition='top center',
-        textfont={'family': 'Roboto Condensed', 'size': 11, 'color': COLORS['azul']},
+        line=dict(color=COLORS['azul'], width=2),
+        marker=dict(size=7, color=COLORS['azul']),
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
-        cliponaxis=False
     ))
     
     fig.add_trace(go.Scatter(
         x=meses_nombres,
         y=gastos,
-        mode='lines+markers+text',
+        mode='lines+markers',
         name='Gasto',
-        line=dict(color=COLORS['rosa'], width=3),
-        marker=dict(size=10, color=COLORS['rosa']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
-        textposition='top center',
-        textfont={'family': 'Roboto Condensed', 'size': 11, 'color': COLORS['rosa']},
+        line=dict(color=COLORS['rosa'], width=2),
+        marker=dict(size=7, color=COLORS['rosa']),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
-        cliponaxis=False
     ))
     
     fig.update_layout(
-        title={
-            'text': f'<span style="font-weight:400">Análisis Gasto y Presupuesto - {año_filtro}</span>',
-            'font': {'size': 16, 'family': 'Roboto Condensed', 'color': title_color},
-            'x': 0,
-            'xanchor': 'left'
-        },
         xaxis_title=None,
         yaxis_title=None,
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         height=320,
-        margin=dict(l=60, r=20, t=80, b=50),
+        margin=dict(l=55, r=15, t=40, b=55),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
@@ -620,17 +589,17 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         ),
         yaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
             fixedrange=True,
             range=[0, y_max]
         ),
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.01,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 12, 'color': text_color},
+            font={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
             bgcolor="rgba(0,0,0,0)"
         ),
         hovermode='x unified',
@@ -649,13 +618,11 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
     tema = st.get_option("theme.base")
     
     if tema == "dark":
-        text_color = "#E5E7EB"
+        text_color = "#FFFFFF"
         grid_color = "rgba(255,255,255,0.15)"
-        title_color = "#FFFFFF"
     else:
         text_color = "#333333"
         grid_color = "#E0E0E0"
-        title_color = COLORS['azul']
     
     df_año = df[df['Año'] == año_filtro].copy()
     
@@ -679,9 +646,6 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         y=ingresos,
         name='Ingreso',
         marker_color=COLORS['cian'],
-        text=[f'${v:,.0f}' if v > 0 else '' for v in ingresos],
-        textposition='outside',
-        textfont={'family': 'Roboto Condensed', 'size': 13, 'color': COLORS['cian']},
         hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'
     ))
     
@@ -690,19 +654,10 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         y=gastos,
         name='Gasto',
         marker_color=COLORS['naranja'],
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos],
-        textposition='outside',
-        textfont={'family': 'Roboto Condensed', 'size': 13, 'color': COLORS['naranja']},
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
     ))
     
     fig.update_layout(
-        title={
-            'text': f'<span style="font-weight:400">Ingresos vs Gastos Mensuales - {año_filtro}</span>',
-            'font': {'size': 16, 'family': 'Roboto Condensed', 'color': title_color},
-            'x': 0,
-            'xanchor': 'left'
-        },
         xaxis_title=None,
         yaxis_title=None,
         barmode='group',
@@ -710,7 +665,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         height=320,
-        margin=dict(l=60, r=20, t=80, b=50),
+        margin=dict(l=55, r=15, t=40, b=55),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
@@ -719,16 +674,16 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         ),
         yaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
             fixedrange=True
         ),
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.01,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 12, 'color': text_color},
+            font={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
             bgcolor="rgba(0,0,0,0)"
         ),
         hoverlabel=dict(
@@ -1002,32 +957,48 @@ with col5:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# GRÁFICOS — fila 1 (gauge + barras horizontales)
+# HELPER: título de gráfico (fuera del recuadro)
+# ============================================
+def chart_title(texto):
+    tema = st.get_option("theme.base")
+    color = "#FFFFFF" if tema == "dark" else "#111111"
+    st.markdown(
+        f"<p style='font-family:Roboto Condensed,sans-serif; font-size:15px; "
+        f"font-weight:600; color:{color}; margin:0 0 4px 2px;'>{texto}</p>",
+        unsafe_allow_html=True
+    )
+
+# ============================================
+# GRÁFICOS — fila 1
 # ============================================
 
 col1, col2 = st.columns(2)
 
 with col1:
+    chart_title("Cumplimiento del Presupuesto")
     fig_gauge = crear_gauge_presupuesto(df_filtrado, presupuesto_mes)
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 with col2:
+    chart_title("Gastos por Categoría")
     fig_barras_h = crear_barras_horizontales_categorias(df_filtrado)
     st.plotly_chart(fig_barras_h, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# GRÁFICOS — fila 2 (líneas + barras verticales)
+# GRÁFICOS — fila 2
 # ============================================
 
 col1, col2 = st.columns(2)
 
 with col1:
+    chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
     st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 with col2:
+    chart_title(f"Ingresos vs Gastos Mensuales — {año_seleccionado}")
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
     st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
