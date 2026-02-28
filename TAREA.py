@@ -165,12 +165,12 @@ st.markdown("""
         font-size: 12px !important;
     }
 
-    /* ===== CHART BOX: mismo estilo que las métricas ===== */
-    .chart-box {
+    /* ===== CHART BOX: apunta al contenedor nativo de plotly en Streamlit ===== */
+    div[data-testid="stPlotlyChart"] {
         background-color: #FFFFFF;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        padding: 20px 20px 10px 20px;
+        padding: 16px 16px 8px 16px;
         margin-bottom: 16px;
     }
 
@@ -227,6 +227,11 @@ st.markdown("""
         }
 
         .chart-box {
+            background-color: #2d3748 !important;
+            border: 1px solid #4A5568;
+        }
+
+        div[data-testid="stPlotlyChart"] {
             background-color: #2d3748 !important;
             border: 1px solid #4A5568;
         }
@@ -429,8 +434,18 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': text_color, 'family': 'Roboto Condensed'},
         height=360,
-        margin=dict(l=20, r=20, t=20, b=20),
+        margin=dict(l=20, r=20, t=60, b=20),
         dragmode=False,
+        title={
+            'text': "<span style='font-weight:400'>Cumplimiento del Presupuesto</span>",
+            'x': 0,
+            'xanchor': 'left',
+            'font': {
+                'size': 18,
+                'family': 'Roboto Condensed',
+                'color': title_color
+            }
+        }
     )
     
     fig.update_layout(
@@ -504,13 +519,14 @@ def crear_barras_horizontales_categorias(df_filtrado):
     ))
 
     fig.update_layout(
+        title={
+            'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
+            'x': 0,
+            'xanchor': 'left',
+            'font': {'size': 18, 'family': 'Roboto Condensed', 'color': title_color}
+        },
         xaxis_title=None,
-        yaxis_title=None,
-        font={'family': 'Roboto Condensed', 'color': text_color},
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        height=360,
-        margin=dict(l=150, r=120, t=20, b=40),
+        margin=dict(l=150, r=120, t=60, b=40),
         xaxis=dict(
             showgrid=True,
             gridcolor=grid_color,
@@ -590,13 +606,19 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     ))
     
     fig.update_layout(
+        title={
+            'text': f'<span style="font-weight:400">Análisis de Gasto y Presupuesto Mensual - {año_filtro}</span>',
+            'font': {'size': 18, 'family': 'Roboto Condensed', 'color': title_color},
+            'x': 0,
+            'xanchor': 'left'
+        },
         xaxis_title=None,
         yaxis_title='Monto ($)',
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         height=390,
-        margin=dict(l=80, r=40, t=10, b=80),
+        margin=dict(l=80, r=40, t=60, b=80),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
@@ -684,6 +706,12 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
     ))
     
     fig.update_layout(
+        title={
+            'text': f'<span style="font-weight:400">Ingresos vs Gastos Mensuales - {año_filtro}</span>',
+            'font': {'size': 18, 'family': 'Roboto Condensed', 'color': title_color},
+            'x': 0,
+            'xanchor': 'left'
+        },
         xaxis_title=None,
         yaxis_title='Monto ($)',
         barmode='group',
@@ -691,7 +719,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         height=390,
-        margin=dict(l=80, r=40, t=10, b=80),
+        margin=dict(l=80, r=40, t=60, b=80),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
@@ -991,26 +1019,12 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown("""
-        <div class="chart-box">
-            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
-                Cumplimiento del Presupuesto
-            </div>
-    """, unsafe_allow_html=True)
     fig_gauge = crear_gauge_presupuesto(df_filtrado, presupuesto_mes)
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
-    st.markdown("""
-        <div class="chart-box">
-            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
-                Gastos por Categoría
-            </div>
-    """, unsafe_allow_html=True)
     fig_barras_h = crear_barras_horizontales_categorias(df_filtrado)
     st.plotly_chart(fig_barras_h, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -1021,26 +1035,12 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"""
-        <div class="chart-box">
-            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
-                Análisis de Gasto y Presupuesto Mensual — {año_seleccionado}
-            </div>
-    """, unsafe_allow_html=True)
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
     st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
-    st.markdown(f"""
-        <div class="chart-box">
-            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
-                Ingresos vs Gastos Mensuales — {año_seleccionado}
-            </div>
-    """, unsafe_allow_html=True)
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
     st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
