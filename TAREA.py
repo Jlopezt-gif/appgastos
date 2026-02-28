@@ -407,15 +407,14 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=gasto_total,
-        domain={'x': [0.0, 1.0], 'y': [0.15, 0.95]},
+        domain={'x': [0.0, 1.0], 'y': [0.2, 1.0]},
         gauge={
             'axis': {
                 'range': [None, max_value],
+                'showticklabels': False,   # sin etiquetas → sin asimetría
                 'tickwidth': 0,
-                'tickcolor': TICK_COLOR,
-                'tickfont': {'family': 'Roboto Condensed', 'size': 9, 'color': TICK_COLOR}
             },
-            'bar': {'color': bar_color, 'thickness': 0.7},
+            'bar': {'color': bar_color, 'thickness': 0.65},
             'bgcolor': "rgba(0,0,0,0)",
             'borderwidth': 0,
             'steps': [
@@ -425,19 +424,19 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
             ],
             'threshold': {
                 'line': {'color': TICK_COLOR, 'width': 2},
-                'thickness': 0.7,
+                'thickness': 0.65,
                 'value': presupuesto_mes
             }
         },
         number={
-            'font': {'family': 'Roboto Condensed', 'size': 24, 'color': TICK_COLOR},
+            'font': {'family': 'Roboto Condensed', 'size': 22, 'color': TICK_COLOR},
             'prefix': "$",
         }
     ))
     fig.add_annotation(
         text=f"Objetivo: ${presupuesto_mes:,.0f}",
         xref="paper", yref="paper",
-        x=0.5, y=0.02,
+        x=0.5, y=0.04,
         showarrow=False,
         font={'family': 'Roboto Condensed', 'size': 10, 'color': TICK_COLOR},
         align="center"
@@ -447,7 +446,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': TICK_COLOR, 'family': 'Roboto Condensed'},
         height=CHART_H,
-        margin=dict(l=30, r=30, t=8, b=22),
+        margin=dict(l=50, r=50, t=10, b=28),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
