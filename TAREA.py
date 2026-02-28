@@ -917,7 +917,6 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 # TABLAS DE GASTOS E INGRESOS
 # ============================================
-st.markdown("### Detalle de Transacciones")
 
 df_gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
 df_ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
@@ -955,7 +954,7 @@ else:
 col1, col2 = st.columns(2)
 
 with col1:
-    st.markdown(f"<h4 style='font-weight:400'>Gastos ({len(df_gastos_tabla)} registros)</h4>", unsafe_allow_html=True)
+    chart_title("Detalle Gastos")
     
     def style_gastos(df):
         return df.style.set_table_styles([
@@ -992,7 +991,7 @@ with col1:
         st.dataframe(df_gastos_tabla, use_container_width=True, height=350, hide_index=False)
 
 with col2:
-    st.markdown(f"<h4 style='font-weight:400'>Ingresos ({len(df_ingresos_tabla)} registros)</h4>", unsafe_allow_html=True)
+    chart_title("Detalle Ingresos")
     
     def style_ingresos(df):
         return df.style.set_table_styles([
