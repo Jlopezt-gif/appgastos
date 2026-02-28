@@ -46,7 +46,16 @@ st.markdown("""
     
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Roboto Condensed', sans-serif !important;
-        color: #0081FF;
+        color: #111111;
+    }
+    
+    /* Espaciado uniforme título → recuadro gráfico */
+    div[data-testid="stVerticalBlock"] h4 {
+        margin-top: 12px !important;
+        margin-bottom: 4px !important;
+    }
+    div[data-testid="stVerticalBlock"] h4 + div[data-testid="stPlotlyChart"] {
+        margin-top: 0 !important;
     }
     
     .stMetric {
@@ -176,10 +185,6 @@ st.markdown("""
     /* Eliminar el fondo blanco interno que Plotly agrega al iframe/svg */
     div[data-testid="stPlotlyChart"] > div {
         background: transparent !important;
-    }
-    /* Evitar que el párrafo del título tenga margin extra arriba */
-    div[data-testid="stMarkdownContainer"] > p {
-        margin-bottom: 2px !important;
     }
 
     /* Ajustes responsivos para móviles */
@@ -437,8 +442,8 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': text_color, 'family': 'Roboto Condensed'},
-        height=320,
-        margin=dict(l=10, r=10, t=10, b=10),
+        height=240,
+        margin=dict(l=10, r=10, t=5, b=5),
         dragmode=False,
         modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
     )
@@ -472,8 +477,8 @@ def crear_barras_horizontales_categorias(df_filtrado):
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
-            height=320,
-            margin=dict(l=10, r=10, t=10, b=10),
+            height=240,
+            margin=dict(l=10, r=10, t=5, b=5),
         )
         return fig
 
@@ -492,7 +497,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         text=[f'${v:,.0f}' for v in por_categoria.values],
         textposition=text_positions,
         cliponaxis=False,
-        textfont=dict(family='Roboto Condensed', size=11, color=bar_text_color),
+        textfont=dict(family='Roboto Condensed', size=10, color=bar_text_color),
         texttemplate="<b>%{text}</b>",
         marker=dict(color=colors_list, opacity=0.9, line=dict(width=0)),
         hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
@@ -504,17 +509,17 @@ def crear_barras_horizontales_categorias(df_filtrado):
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=320,
-        margin=dict(l=110, r=70, t=10, b=30),
+        height=240,
+        margin=dict(l=100, r=60, t=5, b=20),
         xaxis=dict(
             showgrid=True,
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': axis_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': axis_color},
             fixedrange=True,
             zeroline=False,
         ),
         yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': axis_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': axis_color},
             fixedrange=True,
         ),
         dragmode=False,
@@ -579,17 +584,17 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=320,
-        margin=dict(l=55, r=15, t=40, b=55),
+        height=240,
+        margin=dict(l=50, r=10, t=30, b=45),
         xaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
             tickangle=-45,
             fixedrange=True
         ),
         yaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
             fixedrange=True,
             range=[0, y_max]
         ),
@@ -599,13 +604,13 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
             y=1.01,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
+            font={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
             bgcolor="rgba(0,0,0,0)"
         ),
         hovermode='x unified',
         hoverlabel=dict(
             bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=12,
+            font_size=11,
             font_family="Roboto Condensed"
         ),
         dragmode=False,
@@ -664,17 +669,17 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=320,
-        margin=dict(l=55, r=15, t=40, b=55),
+        height=240,
+        margin=dict(l=50, r=10, t=30, b=45),
         xaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
             tickangle=-45,
             fixedrange=True
         ),
         yaxis=dict(
             gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
             fixedrange=True
         ),
         legend=dict(
@@ -683,12 +688,12 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
             y=1.01,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
+            font={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
             bgcolor="rgba(0,0,0,0)"
         ),
         hoverlabel=dict(
             bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=12,
+            font_size=11,
             font_family="Roboto Condensed"
         ),
         dragmode=False,
@@ -957,14 +962,12 @@ with col5:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# HELPER: título de gráfico (fuera del recuadro)
+# HELPER: título de gráfico — usa h4 igual que las tablas
+# para heredar el color automático en dark mode
 # ============================================
 def chart_title(texto):
-    tema = st.get_option("theme.base")
-    color = "#FFFFFF" if tema == "dark" else "#111111"
     st.markdown(
-        f"<p style='font-family:Roboto Condensed,sans-serif; font-size:15px; "
-        f"font-weight:600; color:{color}; margin:0 0 4px 2px;'>{texto}</p>",
+        f"<h4 style='font-weight:500; margin:0 0 4px 0; font-size:15px;'>{texto}</h4>",
         unsafe_allow_html=True
     )
 
