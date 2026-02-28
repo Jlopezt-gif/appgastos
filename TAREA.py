@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -1055,11 +1056,11 @@ def render_tabla_html(df, header_color, table_id):
 
 with col1:
     chart_title("Detalle Gastos")
-    st.markdown(render_tabla_html(df_gastos_tabla, "#00C851", "tbl_gastos"), unsafe_allow_html=True)
+    components.html(render_tabla_html(df_gastos_tabla, "#00C851", "tbl_gastos"), height=280, scrolling=False)
 
 with col2:
     chart_title("Detalle Ingresos")
-    st.markdown(render_tabla_html(df_ingresos_tabla, "#0081FF", "tbl_ingresos"), unsafe_allow_html=True)
+    components.html(render_tabla_html(df_ingresos_tabla, "#0081FF", "tbl_ingresos"), height=280, scrolling=False)
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
