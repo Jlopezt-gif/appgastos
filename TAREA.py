@@ -164,7 +164,16 @@ st.markdown("""
     .header-box p {
         font-size: 12px !important;
     }
-    
+
+    /* ===== CHART BOX: mismo estilo que las métricas ===== */
+    .chart-box {
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 20px 20px 10px 20px;
+        margin-bottom: 16px;
+    }
+
     /* Ajustes responsivos para móviles */
     @media (max-width: 768px) {
         .block-container {
@@ -215,6 +224,11 @@ st.markdown("""
         
         .nombre-usuario {
             color: #CBD5E0 !important;
+        }
+
+        .chart-box {
+            background-color: #2d3748 !important;
+            border: 1px solid #4A5568;
         }
     }
     </style>
@@ -281,11 +295,9 @@ def load_client_data(url):
     df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     
-    # Convertir Fecha a datetime
     if 'Fecha' in df.columns:
         df['Fecha'] = pd.to_datetime(df['Fecha'])
     
-    # Asegurar tipos numéricos
     if 'Monto' in df.columns:
         df['Monto'] = pd.to_numeric(df['Monto'], errors='coerce').fillna(0)
     if 'Año' in df.columns:
@@ -299,7 +311,6 @@ def load_client_data(url):
 
 def load_logo(url):
     try:
-        # Extraer el ID del archivo de Google Drive
         file_id = url.split('/d/')[1].split('/')[0]
         download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         response = requests.get(download_url)
@@ -312,23 +323,17 @@ def load_logo(url):
 # FUNCIONES DE CÁLCULO
 # ============================================
 def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
-    """
-    Calcula el presupuesto disponible del mes
-    """
-    # Filtrar presupuestos del mes
     presupuestos_mes = df[
         (df['Tipo'] == 'Presupuesto') & 
         (df['Año'] == año_filtro) & 
         (df['Mes'] == mes_filtro)
     ].sort_values('Fecha', ascending=False)
     
-    # Obtener el último presupuesto del mes
     if len(presupuestos_mes) > 0:
         ultimo_presupuesto = presupuestos_mes.iloc[0]['Monto']
     else:
         ultimo_presupuesto = 0
     
-    # Sumar todos los gastos del mes
     gastos_mes = df[
         (df['Tipo'] == 'Gasto') & 
         (df['Año'] == año_filtro) & 
@@ -340,9 +345,6 @@ def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
     return presupuesto_disponible, ultimo_presupuesto, gastos_mes
 
 def obtener_ultimo_presupuesto_mes(df, año, mes):
-    """
-    Obtiene el último presupuesto ingresado de un mes específico
-    """
     presupuestos = df[
         (df['Tipo'] == 'Presupuesto') & 
         (df['Año'] == año) & 
@@ -357,20 +359,18 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 # FUNCIONES DE GRÁFICOS
 # ============================================
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
-    """
-    Crea el gráfico de gauge para el cumplimiento del presupuesto
-    """
-    # Detectar tema
     tema = st.get_option("theme.base")
     
     if tema == "dark":
         text_color = "#FFFFFF"
         title_color = "#FFFFFF"
         number_color = "#FFFFFF"
+        paper_bg = "rgba(0,0,0,0)"
     else:
         text_color = "#333333"
         title_color = COLORS['azul']
         number_color = COLORS['azul']
+        paper_bg = "rgba(0,0,0,0)"
     
     gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
     
@@ -425,21 +425,12 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     ))
     
     fig.update_layout(
-        paper_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor=paper_bg,
+        plot_bgcolor="rgba(0,0,0,0)",
         font={'color': text_color, 'family': 'Roboto Condensed'},
-        height=380,
-        margin=dict(l=20, r=20, t=80, b=20),
+        height=360,
+        margin=dict(l=20, r=20, t=20, b=20),
         dragmode=False,
-        title={
-            'text': "<span style='font-weight:400'>Cumplimiento del Presupuesto</span>",
-            'x': 0,
-            'xanchor': 'left',
-            'font': {
-                'size': 20,
-                'family': 'Roboto, Arial, sans-serif',
-                'color': title_color
-            }
-        }
     )
     
     fig.update_layout(
@@ -478,7 +469,9 @@ def crear_barras_horizontales_categorias(df_filtrado):
         )
         fig.update_layout(
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)"
+            plot_bgcolor="rgba(0,0,0,0)",
+            height=360,
+            margin=dict(l=20, r=20, t=20, b=20),
         )
         return fig
 
@@ -511,23 +504,13 @@ def crear_barras_horizontales_categorias(df_filtrado):
     ))
 
     fig.update_layout(
-        title={
-            'text': "<span style='font-weight:400'>Gastos por Categoría</span>",
-            'x': 0,
-            'xanchor': 'left',
-            'font': {
-                'size': 20,
-                'family': 'Roboto, Arial, sans-serif',
-                'color': title_color
-            }
-        },
         xaxis_title=None,
         yaxis_title=None,
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        height=380,
-        margin=dict(l=150, r=120, t=80, b=40),
+        height=360,
+        margin=dict(l=150, r=120, t=20, b=40),
         xaxis=dict(
             showgrid=True,
             gridcolor=grid_color,
@@ -547,9 +530,6 @@ def crear_barras_horizontales_categorias(df_filtrado):
     return fig
 
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
-    """
-    Crea el gráfico de líneas comparando Presupuesto y Gasto mensual
-    """
     tema = st.get_option("theme.base")
     
     if tema == "dark":
@@ -576,7 +556,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         gasto = df_año[(df_año['Tipo'] == 'Gasto') & (df_año['Mes'] == mes)]['Monto'].sum()
         gastos.append(gasto)
     
-    max_valor = max(max(presupuestos), max(gastos))
+    max_valor = max(max(presupuestos), max(gastos)) if max(presupuestos) > 0 or max(gastos) > 0 else 100
     y_max = max_valor * 1.15
     
     fig = go.Figure()
@@ -610,19 +590,13 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     ))
     
     fig.update_layout(
-        title={
-            'text': f'<span style="font-weight:400">Análisis de Gasto y Presupuesto Mensual - {año_filtro}</span>',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': title_color},
-            'x': 0,
-            'xanchor': 'left'
-        },
         xaxis_title=None,
         yaxis_title='Monto ($)',
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=450,
-        margin=dict(l=80, r=40, t=100, b=60),
+        height=390,
+        margin=dict(l=80, r=40, t=10, b=80),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
@@ -636,13 +610,15 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
             fixedrange=True,
             range=[0, y_max]
         ),
+        # leyenda arriba-izquierda
         legend=dict(
             orientation="h",
             yanchor="top",
-            y=-0.15,
+            y=1.0,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 14, 'color': text_color}
+            font={'family': 'Roboto Condensed', 'size': 13, 'color': text_color},
+            bgcolor="rgba(0,0,0,0)"
         ),
         hovermode='x unified',
         hoverlabel=dict(
@@ -657,9 +633,6 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     return fig
 
 def crear_barras_ingreso_gasto_mensual(df, año_filtro):
-    """
-    Crea el gráfico de barras verticales comparando Ingresos y Gastos por mes
-    """
     tema = st.get_option("theme.base")
     
     if tema == "dark":
@@ -711,20 +684,14 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
     ))
     
     fig.update_layout(
-        title={
-            'text': f'<span style="font-weight:400">Ingresos vs Gastos Mensuales - {año_filtro}</span>',
-            'font': {'size': 20, 'family': 'Roboto Condensed', 'color': title_color},
-            'x': 0,
-            'xanchor': 'left'
-        },
         xaxis_title=None,
         yaxis_title='Monto ($)',
         barmode='group',
         font={'family': 'Roboto Condensed', 'color': text_color},
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=450,
-        margin=dict(l=80, r=40, t=100, b=60),
+        height=390,
+        margin=dict(l=80, r=40, t=10, b=80),
         xaxis=dict(
             gridcolor=grid_color,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': text_color},
@@ -737,13 +704,15 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
             title_font={'family': 'Roboto Condensed', 'size': 14, 'color': title_color},
             fixedrange=True
         ),
+        # leyenda arriba-izquierda
         legend=dict(
             orientation="h",
             yanchor="top",
-            y=-0.15,
+            y=1.0,
             xanchor="left",
             x=0,
-            font={'family': 'Roboto Condensed', 'size': 14, 'color': text_color}
+            font={'family': 'Roboto Condensed', 'size': 13, 'color': text_color},
+            bgcolor="rgba(0,0,0,0)"
         ),
         hoverlabel=dict(
             bgcolor="white" if tema != "dark" else "#1F2937",
@@ -954,7 +923,7 @@ ingresos_total = df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum()
 gastos_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
 
 # ============================================
-# MÉTRICAS PRINCIPALES CON MES
+# MÉTRICAS PRINCIPALES
 # ============================================
 
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -1016,30 +985,62 @@ with col5:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# GRÁFICOS
+# GRÁFICOS — fila 1 (gauge + barras horizontales)
 # ============================================
 
 col1, col2 = st.columns(2)
 
 with col1:
+    st.markdown("""
+        <div class="chart-box">
+            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
+                Cumplimiento del Presupuesto
+            </div>
+    """, unsafe_allow_html=True)
     fig_gauge = crear_gauge_presupuesto(df_filtrado, presupuesto_mes)
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
+    st.markdown("""
+        <div class="chart-box">
+            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
+                Gastos por Categoría
+            </div>
+    """, unsafe_allow_html=True)
     fig_barras_h = crear_barras_horizontales_categorias(df_filtrado)
     st.plotly_chart(fig_barras_h, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
+
+# ============================================
+# GRÁFICOS — fila 2 (líneas + barras verticales)
+# ============================================
 
 col1, col2 = st.columns(2)
 
 with col1:
+    st.markdown(f"""
+        <div class="chart-box">
+            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
+                Análisis de Gasto y Presupuesto Mensual — {año_seleccionado}
+            </div>
+    """, unsafe_allow_html=True)
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
     st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with col2:
+    st.markdown(f"""
+        <div class="chart-box">
+            <div style="font-family:'Roboto Condensed',sans-serif; font-size:18px; font-weight:400; color:#0081FF; margin-bottom:4px;">
+                Ingresos vs Gastos Mensuales — {año_seleccionado}
+            </div>
+    """, unsafe_allow_html=True)
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
     st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
