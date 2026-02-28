@@ -411,8 +411,11 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         gauge={
             'axis': {
                 'range': [None, max_value],
-                'showticklabels': False,   # sin etiquetas → sin asimetría
+                'showticklabels': True,
                 'tickwidth': 0,
+                'tickcolor': TICK_COLOR,
+                'tickfont': {'family': 'Roboto Condensed', 'size': 9, 'color': TICK_COLOR},
+                'nticks': 5,
             },
             'bar': {'color': bar_color, 'thickness': 0.65},
             'bgcolor': "rgba(0,0,0,0)",
@@ -446,7 +449,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': TICK_COLOR, 'family': 'Roboto Condensed'},
         height=CHART_H,
-        margin=dict(l=50, r=50, t=10, b=28),
+        margin=dict(l=60, r=60, t=10, b=28),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
