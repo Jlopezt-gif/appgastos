@@ -179,13 +179,13 @@ st.markdown("""
         background-color: #FFFFFF;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        padding: 8px 8px 4px 8px;
+        padding: 12px 12px 8px 12px;
         margin-bottom: 4px;
         overflow: hidden;
     }
     /* Forzar que el SVG interno no desborde */
     div[data-testid="stPlotlyChart"] svg {
-        max-height: 290px !important;
+        max-height: 248px !important;
     }
     /* Eliminar el fondo blanco interno que Plotly agrega al iframe/svg */
     div[data-testid="stPlotlyChart"] > div {
@@ -381,10 +381,10 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 # ============================================
 # FUNCIONES DE GRÁFICOS
 # ============================================
-TICK_COLOR = "#999999"   # gris medio — visible en fondo blanco y negro
+TICK_COLOR = "#999999"
 GRID_COLOR_LIGHT = "#E8E8E8"
 GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
-CHART_H = 280            # altura fija única para todos los gráficos
+CHART_H = 240            # altura reducida para que quepan con holgura
 
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     tema = st.get_option("theme.base")
@@ -407,16 +407,16 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=gasto_total,
-        # dominio: el gauge ocupa la mitad superior, el número la inferior
-        domain={'x': [0, 1], 'y': [0.15, 1.0]},
+        # dominio más compacto: arco ocupa 55-95% vertical, número en zona media
+        domain={'x': [0.05, 0.95], 'y': [0.18, 0.92]},
         gauge={
             'axis': {
                 'range': [None, max_value],
                 'tickwidth': 0,
                 'tickcolor': TICK_COLOR,
-                'tickfont': {'family': 'Roboto Condensed', 'size': 10, 'color': TICK_COLOR}
+                'tickfont': {'family': 'Roboto Condensed', 'size': 9, 'color': TICK_COLOR}
             },
-            'bar': {'color': bar_color, 'thickness': 0.75},
+            'bar': {'color': bar_color, 'thickness': 0.7},
             'bgcolor': "rgba(0,0,0,0)",
             'borderwidth': 0,
             'steps': [
@@ -425,31 +425,30 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
                 {'range': [max_value*0.75, max_value],      'color': step_colors[2]},
             ],
             'threshold': {
-                'line': {'color': TICK_COLOR, 'width': 3},
-                'thickness': 0.75,
+                'line': {'color': TICK_COLOR, 'width': 2},
+                'thickness': 0.7,
                 'value': presupuesto_mes
             }
         },
         number={
-            'font': {'family': 'Roboto Condensed', 'size': 28, 'color': number_color},
+            'font': {'family': 'Roboto Condensed', 'size': 24, 'color': number_color},
             'prefix': "$",
         }
     ))
-    # Añadir subtítulo "Objetivo" como anotación separada para no cortar el layout
     fig.add_annotation(
         text=f"Objetivo: ${presupuesto_mes:,.0f}",
         xref="paper", yref="paper",
-        x=0.5, y=0.04,
+        x=0.5, y=0.02,
         showarrow=False,
-        font={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
+        font={'family': 'Roboto Condensed', 'size': 10, 'color': TICK_COLOR},
         align="center"
     )
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font={'color': text_color, 'family': 'Roboto Condensed'},
+        font={'color': number_color, 'family': 'Roboto Condensed'},
         height=CHART_H,
-        margin=dict(l=20, r=20, t=10, b=20),
+        margin=dict(l=15, r=15, t=8, b=22),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
@@ -492,11 +491,11 @@ def crear_barras_horizontales_categorias(df_filtrado):
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=105, r=65, t=5, b=20),
+        margin=dict(l=95, r=55, t=4, b=18),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':8,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False),
-        yaxis=dict(tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
+        yaxis=dict(tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    fixedrange=True),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
@@ -531,7 +530,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=48, r=10, t=30, b=48),
+        margin=dict(l=42, r=8, t=26, b=42),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
@@ -572,7 +571,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=48, r=10, t=30, b=48),
+        margin=dict(l=42, r=8, t=26, b=42),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
