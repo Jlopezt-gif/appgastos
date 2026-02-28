@@ -926,17 +926,30 @@ col1, col2 = st.columns(2)
 
 with col1:
     chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
-    st.markdown('<div class="chart-scroll-wrap">', unsafe_allow_html=True)
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
-    st.plotly_chart(fig_lineas, use_container_width=False, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown('</div>', unsafe_allow_html=True)
+    html_lineas = fig_lineas.to_html(full_html=False, include_plotlyjs='cdn', config={'displayModeBar': False, 'staticPlot': True})
+    tema_actual = st.get_option("theme.base")
+    bg = "#1e2530" if tema_actual == "dark" else "#FFFFFF"
+    border = "#4A5568" if tema_actual == "dark" else "#E2E8F0"
+    components.html(f"""
+        <div style="background:{bg};border-radius:12px;border:1px solid {border};
+                    box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:12px 12px 8px 12px;
+                    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;">
+            {html_lineas}
+        </div>
+    """, height=330, scrolling=False)
 
 with col2:
     chart_title(f"Ingresos vs Gastos Mensuales — {año_seleccionado}")
-    st.markdown('<div class="chart-scroll-wrap">', unsafe_allow_html=True)
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
-    st.plotly_chart(fig_barras_v, use_container_width=False, config={'displayModeBar': False, 'staticPlot': True})
-    st.markdown('</div>', unsafe_allow_html=True)
+    html_barras = fig_barras_v.to_html(full_html=False, include_plotlyjs='cdn', config={'displayModeBar': False, 'staticPlot': True})
+    components.html(f"""
+        <div style="background:{bg};border-radius:12px;border:1px solid {border};
+                    box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:12px 12px 8px 12px;
+                    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;">
+            {html_barras}
+        </div>
+    """, height=330, scrolling=False)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
