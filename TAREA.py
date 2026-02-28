@@ -185,24 +185,6 @@ st.markdown("""
         margin-bottom: 4px;
         overflow: hidden;
     }
-    /* Recuadro con scroll horizontal para gráficos anchos */
-    .chart-scroll-wrap {
-        background-color: #FFFFFF;
-        border-radius: 12px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-        padding: 12px 12px 8px 12px;
-        margin-bottom: 4px;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-    }
-    @media (prefers-color-scheme: dark) {
-        .chart-scroll-wrap {
-            background-color: #1e2530 !important;
-            border-color: #4A5568;
-        }
-    }
     /* Forzar que el SVG interno no desborde */
     div[data-testid="stPlotlyChart"] svg {
         max-height: 248px !important;
@@ -536,34 +518,33 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
 
     max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
-    y_max = max_v * 1.35   # más espacio arriba para las etiquetas
+    y_max = max_v * 1.25
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers+text',
         name='Presupuesto',
         line=dict(color=COLORS['azul'], width=1),
-        marker=dict(size=4, color=COLORS['azul']),
+        marker=dict(size=3, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['azul']),
+        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
     fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
         name='Gasto',
         line=dict(color=COLORS['rosa'], width=1),
-        marker=dict(size=4, color=COLORS['rosa']),
+        marker=dict(size=3, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
-        textposition='bottom center',   # abajo para no solaparse con Presupuesto
-        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['rosa']),
+        textposition='top center',
+        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
-        height=300,
-        width=820,   # ancho fijo → scroll horizontal en móvil
-        margin=dict(l=48, r=20, t=36, b=48),
+        height=CHART_H,
+        margin=dict(l=42, r=8, t=26, b=42),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
@@ -598,7 +579,7 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         textposition='outside',
         textangle=-90,
         cliponaxis=False,
-        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['cian']),
+        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
         hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'))
     fig.add_trace(go.Bar(x=meses_l, y=gastos_l, name='Gasto',
         marker_color=COLORS['naranja'],
@@ -606,16 +587,15 @@ def crear_barras_ingreso_gasto_mensual(df, año_filtro):
         textposition='outside',
         textangle=-90,
         cliponaxis=False,
-        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['naranja']),
+        textfont=dict(family='Roboto Condensed', size=8, color=TICK_COLOR),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'))
 
     fig.update_layout(
         barmode='group',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
-        height=300,
-        width=820,   # ancho fijo → scroll horizontal en móvil
-        margin=dict(l=48, r=20, t=60, b=48),
+        height=CHART_H,
+        margin=dict(l=42, r=8, t=52, b=42),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
@@ -927,29 +907,12 @@ col1, col2 = st.columns(2)
 with col1:
     chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
-    html_lineas = fig_lineas.to_html(full_html=False, include_plotlyjs='cdn', config={'displayModeBar': False, 'staticPlot': True})
-    tema_actual = st.get_option("theme.base")
-    bg = "#1e2530" if tema_actual == "dark" else "#FFFFFF"
-    border = "#4A5568" if tema_actual == "dark" else "#E2E8F0"
-    components.html(f"""
-        <div style="background:{bg};border-radius:12px;border:1px solid {border};
-                    box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:12px 12px 8px 12px;
-                    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;">
-            {html_lineas}
-        </div>
-    """, height=330, scrolling=False)
+    st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 with col2:
     chart_title(f"Ingresos vs Gastos Mensuales — {año_seleccionado}")
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
-    html_barras = fig_barras_v.to_html(full_html=False, include_plotlyjs='cdn', config={'displayModeBar': False, 'staticPlot': True})
-    components.html(f"""
-        <div style="background:{bg};border-radius:12px;border:1px solid {border};
-                    box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:12px 12px 8px 12px;
-                    overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;">
-            {html_barras}
-        </div>
-    """, height=330, scrolling=False)
+    st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
