@@ -407,8 +407,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     fig = go.Figure(go.Indicator(
         mode="gauge+number",
         value=gasto_total,
-        # dominio más compacto: arco ocupa 55-95% vertical, número en zona media
-        domain={'x': [0.05, 0.95], 'y': [0.18, 0.92]},
+        domain={'x': [0.0, 1.0], 'y': [0.15, 0.95]},
         gauge={
             'axis': {
                 'range': [None, max_value],
@@ -431,7 +430,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
             }
         },
         number={
-            'font': {'family': 'Roboto Condensed', 'size': 24, 'color': number_color},
+            'font': {'family': 'Roboto Condensed', 'size': 24, 'color': TICK_COLOR},
             'prefix': "$",
         }
     ))
@@ -446,9 +445,9 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font={'color': number_color, 'family': 'Roboto Condensed'},
+        font={'color': TICK_COLOR, 'family': 'Roboto Condensed'},
         height=CHART_H,
-        margin=dict(l=15, r=15, t=8, b=22),
+        margin=dict(l=30, r=30, t=8, b=22),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
