@@ -553,10 +553,10 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
-        height=320,
-        margin=dict(l=50, r=12, t=36, b=70),
+        height=340,
+        margin=dict(l=50, r=12, t=36, b=95),
         xaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
         yaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
