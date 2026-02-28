@@ -927,8 +927,7 @@ def formatear_fecha_espanol(fecha):
         5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Ago',
         9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dic'
     }
-    # Formato compacto: "15 Ene 26 14:30" — sin segundos, año en 2 dígitos
-    return f"{fecha.day} {meses_abrev[fecha.month]} {str(fecha.year)[-2:]} {fecha.strftime('%H:%M')}"
+    return f"{fecha.day} {meses_abrev[fecha.month]} {fecha.year} {fecha.strftime('%H:%M')}"
 
 if len(df_gastos) > 0:
     df_gastos['Fecha_formato'] = df_gastos['Fecha'].apply(formatear_fecha_espanol)
@@ -959,17 +958,18 @@ with col1:
                 ('background-color', '#00C851'),
                 ('color', 'white'),
                 ('font-weight', 'bold'),
-                ('padding', '6px'),
-                ('font-size', '11px')
+                ('padding', '3px 4px'),
+                ('font-size', '9px')
             ]},
             {'selector': 'tbody td', 'props': [
                 ('background-color', '#FFFFFF'),
                 ('color', '#333333'),
-                ('font-size', '10px'),
-                ('padding', '4px')
+                ('font-size', '9px'),
+                ('padding', '3px 4px'),
+                ('white-space', 'nowrap'),
             ]}
         ])
-    
+
     if len(df_gastos_tabla) > 0:
         styled_gastos = style_gastos(df_gastos_tabla)
         st.dataframe(
@@ -978,8 +978,8 @@ with col1:
             height=250,
             hide_index=False,
             column_config={
-                "Fecha":       st.column_config.TextColumn("Fecha",       width="medium"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="small"),
+                "Fecha":       st.column_config.TextColumn("Fecha",       width="small"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
                 "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
                 "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
             }
@@ -996,17 +996,18 @@ with col2:
                 ('background-color', '#0081FF'),
                 ('color', 'white'),
                 ('font-weight', 'bold'),
-                ('padding', '6px'),
-                ('font-size', '11px')
+                ('padding', '3px 4px'),
+                ('font-size', '9px')
             ]},
             {'selector': 'tbody td', 'props': [
                 ('background-color', '#FFFFFF'),
                 ('color', '#333333'),
-                ('font-size', '10px'),
-                ('padding', '4px')
+                ('font-size', '9px'),
+                ('padding', '3px 4px'),
+                ('white-space', 'nowrap'),
             ]}
         ])
-    
+
     if len(df_ingresos_tabla) > 0:
         styled_ingresos = style_ingresos(df_ingresos_tabla)
         st.dataframe(
@@ -1015,8 +1016,8 @@ with col2:
             height=250,
             hide_index=False,
             column_config={
-                "Fecha":       st.column_config.TextColumn("Fecha",       width="medium"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="small"),
+                "Fecha":       st.column_config.TextColumn("Fecha",       width="small"),
+                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
                 "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
                 "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
             }
