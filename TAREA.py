@@ -969,6 +969,7 @@ def render_tabla_html(df, header_color, table_id):
         </tr>"""
 
     return f"""
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
       #{table_id}-wrap {{
         overflow-x: auto;
