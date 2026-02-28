@@ -194,6 +194,16 @@ st.markdown("""
         background: transparent !important;
     }
 
+    /* Scroll horizontal en móvil para gráficos */
+    @media (max-width: 768px) {
+        div[data-testid="stPlotlyChart"] {
+            overflow-x: auto !important;
+        }
+        div[data-testid="stPlotlyChart"] > div {
+            min-width: 600px !important;
+        }
+    }
+
     /* Ajustes responsivos para móviles */
     @media (max-width: 768px) {
         .block-container {
@@ -518,7 +528,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
 
     max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
-    y_max = max_v * 1.45   # más espacio arriba para las etiquetas
+    y_max = max_v * 1.45   # espacio para etiquetas arriba
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers+text',
@@ -527,7 +537,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=6, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=12, color=COLORS['azul']),
+        textfont=dict(family='Roboto Condensed', size=11, color=COLORS['azul']),
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
     fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
@@ -536,27 +546,26 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=6, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=12, color=COLORS['rosa']),
+        textfont=dict(family='Roboto Condensed', size=11, color=COLORS['rosa']),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
-        height=340,
-        width=1100,
-        margin=dict(l=55, r=20, t=36, b=72),
+        height=320,
+        margin=dict(l=50, r=12, t=36, b=70),
         xaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
         yaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
+                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)"),
         hovermode='x unified',
-        hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=12),
+        hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
@@ -903,46 +912,14 @@ st.markdown("<br>", unsafe_allow_html=True)
 # GRÁFICOS — fila 2
 # ============================================
 
-# Gráfico de líneas: ancho completo con scroll horizontal
-chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
-fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
-fig_lineas_json = fig_lineas.to_json()
-components.html(f"""
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <style>
-      #lineas-wrap {{
-        overflow-x: auto;
-        overflow-y: hidden;
-        background: transparent;
-        border-radius: 12px;
-        border: 1px solid #E2E8F0;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
-        padding: 12px 12px 8px 12px;
-      }}
-      @media (prefers-color-scheme: dark) {{
-        #lineas-wrap {{ background: #1e2530 !important; border-color: #4A5568; }}
-      }}
-    </style>
-    <div id="lineas-wrap">
-      <div id="lineas-chart"></div>
-    </div>
-    <script>
-      var fig = {fig_lineas_json};
-      fig.layout.paper_bgcolor = 'rgba(0,0,0,0)';
-      fig.layout.plot_bgcolor  = 'rgba(0,0,0,0)';
-      Plotly.newPlot('lineas-chart', fig.data, fig.layout, {{
-        displayModeBar: false,
-        staticPlot: true,
-        responsive: false
-      }});
-    </script>
-""", height=380, scrolling=False)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
 col1, col2 = st.columns(2)
 
 with col1:
+    chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
+    fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
+    st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+
+with col2:
     chart_title(f"Ingresos vs Gastos Mensuales — {año_seleccionado}")
     fig_barras_v = crear_barras_ingreso_gasto_mensual(df, año_seleccionado)
     st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
