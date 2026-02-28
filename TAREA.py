@@ -194,16 +194,6 @@ st.markdown("""
         background: transparent !important;
     }
 
-    /* Scroll horizontal en móvil para gráficos */
-    @media (max-width: 768px) {
-        div[data-testid="stPlotlyChart"] {
-            overflow-x: auto !important;
-        }
-        div[data-testid="stPlotlyChart"] > div {
-            min-width: 600px !important;
-        }
-    }
-
     /* Ajustes responsivos para móviles */
     @media (max-width: 768px) {
         .block-container {
@@ -528,41 +518,41 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
 
     max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
-    y_max = max_v * 1.45   # espacio para etiquetas arriba
+    y_max = max_v * 1.25
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers+text',
         name='Presupuesto',
-        line=dict(color=COLORS['azul'], width=2),
-        marker=dict(size=6, color=COLORS['azul']),
+        line=dict(color=COLORS['azul'], width=1),
+        marker=dict(size=3, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=11, color=COLORS['azul']),
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['azul']),   # ← color azul
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
     fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
         name='Gasto',
-        line=dict(color=COLORS['rosa'], width=2),
-        marker=dict(size=6, color=COLORS['rosa']),
+        line=dict(color=COLORS['rosa'], width=1),
+        marker=dict(size=3, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=11, color=COLORS['rosa']),
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['rosa']),   # ← color rosa
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
-        height=340,
-        margin=dict(l=50, r=12, t=36, b=95),
+        height=CHART_H,
+        margin=dict(l=42, r=8, t=26, b=62),   # ← b de 42 → 62
         xaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
         yaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
+        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+                    font={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)"),
         hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
