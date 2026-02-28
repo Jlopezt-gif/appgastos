@@ -950,81 +950,116 @@ else:
 
 col1, col2 = st.columns(2)
 
+def render_tabla_html(df, header_color, table_id):
+    """Genera tabla HTML con ordenamiento por columna, sin drag, columnas auto-fit."""
+    if len(df) == 0:
+        return "<p style='color:#999;font-size:12px;'>Sin registros</p>"
+
+    filas_html = ""
+    for i, row in df.iterrows():
+        monto = row['Monto']
+        filas_html += f"""
+        <tr>
+          <td>{i}</td>
+          <td style='white-space:nowrap'>{row['Fecha']}</td>
+          <td>{row['Descripción']}</td>
+          <td style='white-space:nowrap'>{row['Categoría']}</td>
+          <td style='white-space:nowrap;text-align:right'>${monto:,.0f}</td>
+        </tr>"""
+
+    return f"""
+    <style>
+      #{table_id}-wrap {{
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 260px;
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      }}
+      #{table_id} {{
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Roboto Condensed', sans-serif;
+        font-size: 11px;
+      }}
+      #{table_id} thead th {{
+        background-color: {header_color};
+        color: white;
+        padding: 6px 8px;
+        text-align: left;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }}
+      #{table_id} thead th:hover {{ opacity: 0.85; }}
+      #{table_id} thead th::after {{
+        content: ' ⇅';
+        font-size: 9px;
+        opacity: 0.6;
+      }}
+      #{table_id} tbody tr:nth-child(even) td {{
+        background-color: #F9FAFB;
+      }}
+      #{table_id} tbody tr:nth-child(odd) td {{
+        background-color: #FFFFFF;
+      }}
+      #{table_id} tbody td {{
+        padding: 5px 8px;
+        color: #333;
+        border-bottom: 1px solid #F0F0F0;
+      }}
+      @media (prefers-color-scheme: dark) {{
+        #{table_id}-wrap {{ border-color: #4A5568; }}
+        #{table_id} tbody tr:nth-child(even) td {{ background-color: #2d3748 !important; color: #E2E8F0; }}
+        #{table_id} tbody tr:nth-child(odd) td  {{ background-color: #1e2530 !important; color: #E2E8F0; }}
+        #{table_id} tbody td {{ border-bottom-color: #4A5568; }}
+      }}
+    </style>
+    <div id="{table_id}-wrap">
+      <table id="{table_id}">
+        <thead>
+          <tr>
+            <th onclick="sortTable('{table_id}',0)">#</th>
+            <th onclick="sortTable('{table_id}',1)">Fecha</th>
+            <th onclick="sortTable('{table_id}',2)">Descripción</th>
+            <th onclick="sortTable('{table_id}',3)">Categoría</th>
+            <th onclick="sortTable('{table_id}',4)">Monto</th>
+          </tr>
+        </thead>
+        <tbody>{filas_html}</tbody>
+      </table>
+    </div>
+    <script>
+    function sortTable(id, col) {{
+      var table = document.getElementById(id);
+      var tbody = table.querySelector('tbody');
+      var rows = Array.from(tbody.querySelectorAll('tr'));
+      var asc = table.dataset.sortCol == col && table.dataset.sortDir == 'asc';
+      rows.sort(function(a, b) {{
+        var av = a.cells[col].innerText.replace(/[$,]/g,'');
+        var bv = b.cells[col].innerText.replace(/[$,]/g,'');
+        var an = parseFloat(av), bn = parseFloat(bv);
+        if (!isNaN(an) && !isNaN(bn)) return asc ? bn - an : an - bn;
+        return asc ? bv.localeCompare(av) : av.localeCompare(bv);
+      }});
+      rows.forEach(function(r) {{ tbody.appendChild(r); }});
+      table.dataset.sortCol = col;
+      table.dataset.sortDir = asc ? 'desc' : 'asc';
+    }}
+    </script>
+    """
+
 with col1:
     chart_title("Detalle Gastos")
-    
-    def style_gastos(df):
-        return df.style.set_table_styles([
-            {'selector': 'thead th', 'props': [
-                ('background-color', '#00C851'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '3px 4px'),
-                ('font-size', '9px')
-            ]},
-            {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333'),
-                ('font-size', '9px'),
-                ('padding', '3px 4px'),
-                ('white-space', 'nowrap'),
-            ]}
-        ])
-
-    if len(df_gastos_tabla) > 0:
-        styled_gastos = style_gastos(df_gastos_tabla)
-        st.dataframe(
-            styled_gastos,
-            use_container_width=True,
-            height=250,
-            hide_index=False,
-            column_config={
-                "Fecha":       st.column_config.TextColumn("Fecha",       width="small"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
-                "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
-                "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
-            }
-        )
-    else:
-        st.dataframe(df_gastos_tabla, use_container_width=True, height=250, hide_index=False)
+    st.markdown(render_tabla_html(df_gastos_tabla, "#00C851", "tbl_gastos"), unsafe_allow_html=True)
 
 with col2:
     chart_title("Detalle Ingresos")
-    
-    def style_ingresos(df):
-        return df.style.set_table_styles([
-            {'selector': 'thead th', 'props': [
-                ('background-color', '#0081FF'),
-                ('color', 'white'),
-                ('font-weight', 'bold'),
-                ('padding', '3px 4px'),
-                ('font-size', '9px')
-            ]},
-            {'selector': 'tbody td', 'props': [
-                ('background-color', '#FFFFFF'),
-                ('color', '#333333'),
-                ('font-size', '9px'),
-                ('padding', '3px 4px'),
-                ('white-space', 'nowrap'),
-            ]}
-        ])
-
-    if len(df_ingresos_tabla) > 0:
-        styled_ingresos = style_ingresos(df_ingresos_tabla)
-        st.dataframe(
-            styled_ingresos,
-            use_container_width=True,
-            height=250,
-            hide_index=False,
-            column_config={
-                "Fecha":       st.column_config.TextColumn("Fecha",       width="small"),
-                "Descripción": st.column_config.TextColumn("Descripción", width="medium"),
-                "Categoría":   st.column_config.TextColumn("Categoría",   width="small"),
-                "Monto":       st.column_config.NumberColumn("Monto", format="$%.0f", width="small"),
-            }
-        )
-    else:
-        st.dataframe(df_ingresos_tabla, use_container_width=True, height=250, hide_index=False)
+    st.markdown(render_tabla_html(df_ingresos_tabla, "#0081FF", "tbl_ingresos"), unsafe_allow_html=True)
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
