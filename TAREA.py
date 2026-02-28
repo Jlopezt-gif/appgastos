@@ -181,6 +181,11 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         padding: 8px 8px 4px 8px;
         margin-bottom: 4px;
+        overflow: hidden;
+    }
+    /* Forzar que el SVG interno no desborde */
+    div[data-testid="stPlotlyChart"] svg {
+        max-height: 290px !important;
     }
     /* Eliminar el fondo blanco interno que Plotly agrega al iframe/svg */
     div[data-testid="stPlotlyChart"] > div {
@@ -376,330 +381,211 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 # ============================================
 # FUNCIONES DE GRÁFICOS
 # ============================================
+TICK_COLOR = "#999999"   # gris medio — visible en fondo blanco y negro
+GRID_COLOR_LIGHT = "#E8E8E8"
+GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
+CHART_H = 280            # altura fija única para todos los gráficos
+
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     tema = st.get_option("theme.base")
-    
-    if tema == "dark":
-        text_color = "#FFFFFF"
-        number_color = "#FFFFFF"
-    else:
-        text_color = "#333333"
-        number_color = "#333333"
-    
+    number_color = "#FFFFFF" if tema == "dark" else "#222222"
+    text_color   = "#FFFFFF" if tema == "dark" else "#222222"
+
     gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
-    
-    if presupuesto_mes == 0:
-        max_value = gasto_total if gasto_total > 0 else 100
-    else:
-        max_value = presupuesto_mes
-    
-    if presupuesto_mes > 0:
-        porcentaje = (gasto_total / presupuesto_mes) * 100
-    else:
-        porcentaje = 0
-    
-    if porcentaje <= 50:
-        color = COLORS['cian']
-    elif porcentaje <= 75:
-        color = COLORS['naranja']
-    else:
-        color = COLORS['rosa']
-    
+    max_value   = presupuesto_mes if presupuesto_mes > 0 else (gasto_total if gasto_total > 0 else 100)
+    porcentaje  = (gasto_total / presupuesto_mes * 100) if presupuesto_mes > 0 else 0
+
+    if porcentaje <= 50:   bar_color = COLORS['cian']
+    elif porcentaje <= 75: bar_color = COLORS['naranja']
+    else:                  bar_color = COLORS['rosa']
+
+    step_colors = (
+        ['#E5F5FF', '#FFF4E5', '#FFE5F2'] if tema != "dark"
+        else ['rgba(0,129,255,0.2)', 'rgba(255,157,0,0.2)', 'rgba(255,46,149,0.2)']
+    )
+
     fig = go.Figure(go.Indicator(
-        mode = "gauge+number",
-        value = gasto_total,
-        domain = {'x': [0.05, 0.95], 'y': [0.0, 1.0]},
-        gauge = {
+        mode="gauge+number",
+        value=gasto_total,
+        # dominio: el gauge ocupa la mitad superior, el número la inferior
+        domain={'x': [0, 1], 'y': [0.15, 1.0]},
+        gauge={
             'axis': {
                 'range': [None, max_value],
                 'tickwidth': 0,
-                'tickcolor': text_color,
-                'tickfont': {'family': 'Roboto Condensed', 'size': 11, 'color': text_color}
+                'tickcolor': TICK_COLOR,
+                'tickfont': {'family': 'Roboto Condensed', 'size': 10, 'color': TICK_COLOR}
             },
-            'bar': {'color': color, 'thickness': 0.8},
+            'bar': {'color': bar_color, 'thickness': 0.75},
             'bgcolor': "rgba(0,0,0,0)",
             'borderwidth': 0,
-            'bordercolor': "rgba(0,0,0,0)",
             'steps': [
-                {'range': [0, max_value * 0.5], 'color': '#E5F5FF' if tema != "dark" else 'rgba(0, 129, 255, 0.2)'},
-                {'range': [max_value * 0.5, max_value * 0.75], 'color': '#FFF4E5' if tema != "dark" else 'rgba(255, 157, 0, 0.2)'},
-                {'range': [max_value * 0.75, max_value], 'color': '#FFE5F2' if tema != "dark" else 'rgba(255, 46, 149, 0.2)'}
+                {'range': [0,              max_value*0.5],  'color': step_colors[0]},
+                {'range': [max_value*0.5,  max_value*0.75], 'color': step_colors[1]},
+                {'range': [max_value*0.75, max_value],      'color': step_colors[2]},
             ],
             'threshold': {
-                'line': {'color': text_color, 'width': 4},
+                'line': {'color': TICK_COLOR, 'width': 3},
                 'thickness': 0.75,
                 'value': presupuesto_mes
             }
         },
-        number = {
-            'font': {'family': 'Roboto Condensed', 'size': 32, 'color': number_color},
+        number={
+            'font': {'family': 'Roboto Condensed', 'size': 28, 'color': number_color},
             'prefix': "$",
-            'suffix': f"<br><span style='font-size:13px; color:{text_color}'>Objetivo: ${presupuesto_mes:,.0f}</span>"
         }
     ))
-    
+    # Añadir subtítulo "Objetivo" como anotación separada para no cortar el layout
+    fig.add_annotation(
+        text=f"Objetivo: ${presupuesto_mes:,.0f}",
+        xref="paper", yref="paper",
+        x=0.5, y=0.04,
+        showarrow=False,
+        font={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
+        align="center"
+    )
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         font={'color': text_color, 'family': 'Roboto Condensed'},
-        height=240,
-        margin=dict(l=10, r=10, t=5, b=5),
+        height=CHART_H,
+        margin=dict(l=20, r=20, t=10, b=20),
         dragmode=False,
-        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']},
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
-    
     return fig
 
 def crear_barras_horizontales_categorias(df_filtrado):
-    tema = st.get_option("theme.base")
-
-    if tema == "dark":
-        text_color = "#FFFFFF"
-        grid_color = "rgba(255,255,255,0.15)"
-        axis_color = "#FFFFFF"
-        bar_text_color = "white"
-    else:
-        text_color = "#333333"
-        grid_color = "#E0E0E0"
-        axis_color = "#333333"
-        bar_text_color = "white"
+    tema     = st.get_option("theme.base")
+    grid_c   = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+    bar_text = "white"
 
     gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
-    
+
     if len(gastos) == 0:
         fig = go.Figure()
-        fig.add_annotation(
-            text="No hay datos de gastos para mostrar",
-            xref="paper", yref="paper",
-            x=0.5, y=0.5, showarrow=False,
-            font={'size': 14, 'family': 'Roboto Condensed', 'color': text_color}
-        )
-        fig.update_layout(
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            height=240,
-            margin=dict(l=10, r=10, t=5, b=5),
-        )
+        fig.add_annotation(text="Sin datos", xref="paper", yref="paper",
+                           x=0.5, y=0.5, showarrow=False,
+                           font={'size': 13, 'color': TICK_COLOR})
+        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                          height=CHART_H, margin=dict(l=10,r=10,t=5,b=5))
         return fig
 
-    por_categoria = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
-    n_cats = len(por_categoria)
-    colors_list = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(n_cats)]
-    max_valor = por_categoria.max()
-    text_positions = ['inside' if v > max_valor * 0.15 else 'outside' for v in por_categoria.values]
+    por_cat  = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
+    n        = len(por_cat)
+    colors   = [COLOR_PALETTE[i % len(COLOR_PALETTE)] for i in range(n)]
+    mx       = por_cat.max()
+    tpos     = ['inside' if v > mx*0.15 else 'outside' for v in por_cat.values]
 
     fig = go.Figure()
-
     fig.add_trace(go.Bar(
-        y=por_categoria.index,
-        x=por_categoria.values,
+        y=por_cat.index, x=por_cat.values,
         orientation='h',
-        text=[f'${v:,.0f}' for v in por_categoria.values],
-        textposition=text_positions,
-        cliponaxis=False,
-        textfont=dict(family='Roboto Condensed', size=10, color=bar_text_color),
+        text=[f'${v:,.0f}' for v in por_cat.values],
+        textposition=tpos, cliponaxis=False,
+        textfont=dict(family='Roboto Condensed', size=10, color=bar_text),
         texttemplate="<b>%{text}</b>",
-        marker=dict(color=colors_list, opacity=0.9, line=dict(width=0)),
-        hovertemplate='<b>%{y}</b><br>Monto: $%{x:,.0f}<extra></extra>'
+        marker=dict(color=colors, opacity=0.9, line=dict(width=0)),
+        hovertemplate='<b>%{y}</b><br>$%{x:,.0f}<extra></extra>'
     ))
-
     fig.update_layout(
-        xaxis_title=None,
-        yaxis_title=None,
-        font={'family': 'Roboto Condensed', 'color': text_color},
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        height=240,
-        margin=dict(l=100, r=60, t=5, b=20),
-        xaxis=dict(
-            showgrid=True,
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': axis_color},
-            fixedrange=True,
-            zeroline=False,
-        ),
-        yaxis=dict(
-            tickfont={'family': 'Roboto Condensed', 'size': 10, 'color': axis_color},
-            fixedrange=True,
-        ),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
+        height=CHART_H,
+        margin=dict(l=105, r=65, t=5, b=20),
+        xaxis=dict(showgrid=True, gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   fixedrange=True, zeroline=False),
+        yaxis=dict(tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
+                   fixedrange=True),
         dragmode=False,
-        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
-
     return fig
 
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
-    tema = st.get_option("theme.base")
-    
-    if tema == "dark":
-        text_color = "#FFFFFF"
-        grid_color = "rgba(255,255,255,0.15)"
-    else:
-        text_color = "#333333"
-        grid_color = "#E0E0E0"
-    
+    tema   = st.get_option("theme.base")
+    grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+
     df_año = df[df['Año'] == año_filtro].copy()
-    
-    meses_numeros = list(range(1, 13))
-    meses_nombres = [MESES[m] for m in meses_numeros]
-    
-    presupuestos = []
-    gastos = []
-    
-    for mes in meses_numeros:
-        presupuesto = obtener_ultimo_presupuesto_mes(df_año, año_filtro, mes)
-        presupuestos.append(presupuesto)
-        
-        gasto = df_año[(df_año['Tipo'] == 'Gasto') & (df_año['Mes'] == mes)]['Monto'].sum()
-        gastos.append(gasto)
-    
-    max_valor = max(max(presupuestos), max(gastos)) if max(presupuestos) > 0 or max(gastos) > 0 else 100
-    y_max = max_valor * 1.25
-    
+    meses_n = list(range(1, 13))
+    meses_l = [MESES[m] for m in meses_n]
+
+    presupuestos = [obtener_ultimo_presupuesto_mes(df_año, año_filtro, m) for m in meses_n]
+    gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
+
+    max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
+    y_max = max_v * 1.25
+
     fig = go.Figure()
-    
-    fig.add_trace(go.Scatter(
-        x=meses_nombres,
-        y=presupuestos,
-        mode='lines+markers',
-        name='Presupuesto',
-        line=dict(color=COLORS['azul'], width=2),
-        marker=dict(size=7, color=COLORS['azul']),
-        hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=meses_nombres,
-        y=gastos,
-        mode='lines+markers',
-        name='Gasto',
-        line=dict(color=COLORS['rosa'], width=2),
-        marker=dict(size=7, color=COLORS['rosa']),
-        hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
-    ))
-    
+    fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers',
+        name='Presupuesto', line=dict(color=COLORS['azul'], width=2),
+        marker=dict(size=6, color=COLORS['azul']),
+        hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>'))
+    fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers',
+        name='Gasto', line=dict(color=COLORS['rosa'], width=2),
+        marker=dict(size=6, color=COLORS['rosa']),
+        hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'))
+
     fig.update_layout(
-        xaxis_title=None,
-        yaxis_title=None,
-        font={'family': 'Roboto Condensed', 'color': text_color},
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=240,
-        margin=dict(l=50, r=10, t=30, b=45),
-        xaxis=dict(
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
-            tickangle=-45,
-            fixedrange=True
-        ),
-        yaxis=dict(
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
-            fixedrange=True,
-            range=[0, y_max]
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.01,
-            xanchor="left",
-            x=0,
-            font={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
-            bgcolor="rgba(0,0,0,0)"
-        ),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font={'family':'Roboto Condensed','color':TICK_COLOR},
+        height=CHART_H,
+        margin=dict(l=48, r=10, t=30, b=48),
+        xaxis=dict(gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   tickangle=-45, fixedrange=True),
+        yaxis=dict(gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   fixedrange=True, range=[0, y_max]),
+        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+                    font={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)"),
         hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=11,
-            font_family="Roboto Condensed"
-        ),
+        hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
-        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
-    
     return fig
 
 def crear_barras_ingreso_gasto_mensual(df, año_filtro):
-    tema = st.get_option("theme.base")
-    
-    if tema == "dark":
-        text_color = "#FFFFFF"
-        grid_color = "rgba(255,255,255,0.15)"
-    else:
-        text_color = "#333333"
-        grid_color = "#E0E0E0"
-    
-    df_año = df[df['Año'] == año_filtro].copy()
-    
-    meses_numeros = list(range(1, 13))
-    meses_nombres = [MESES[m] for m in meses_numeros]
-    
-    ingresos = []
-    gastos = []
-    
-    for mes in meses_numeros:
-        ingreso = df_año[(df_año['Tipo'] == 'Ingreso') & (df_año['Mes'] == mes)]['Monto'].sum()
-        ingresos.append(ingreso)
-        
-        gasto = df_año[(df_año['Tipo'] == 'Gasto') & (df_año['Mes'] == mes)]['Monto'].sum()
-        gastos.append(gasto)
-    
+    tema   = st.get_option("theme.base")
+    grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+
+    df_año  = df[df['Año'] == año_filtro].copy()
+    meses_n = list(range(1, 13))
+    meses_l = [MESES[m] for m in meses_n]
+
+    ingresos = [df_año[(df_año['Tipo']=='Ingreso')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
+    gastos_l = [df_año[(df_año['Tipo']=='Gasto') &(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
+
     fig = go.Figure()
-    
-    fig.add_trace(go.Bar(
-        x=meses_nombres,
-        y=ingresos,
-        name='Ingreso',
+    fig.add_trace(go.Bar(x=meses_l, y=ingresos, name='Ingreso',
         marker_color=COLORS['cian'],
-        hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'
-    ))
-    
-    fig.add_trace(go.Bar(
-        x=meses_nombres,
-        y=gastos,
-        name='Gasto',
+        hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>'))
+    fig.add_trace(go.Bar(x=meses_l, y=gastos_l, name='Gasto',
         marker_color=COLORS['naranja'],
-        hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'
-    ))
-    
+        hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>'))
+
     fig.update_layout(
-        xaxis_title=None,
-        yaxis_title=None,
         barmode='group',
-        font={'family': 'Roboto Condensed', 'color': text_color},
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        height=240,
-        margin=dict(l=50, r=10, t=30, b=45),
-        xaxis=dict(
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
-            tickangle=-45,
-            fixedrange=True
-        ),
-        yaxis=dict(
-            gridcolor=grid_color,
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': text_color},
-            fixedrange=True
-        ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.01,
-            xanchor="left",
-            x=0,
-            font={'family': 'Roboto Condensed', 'size': 10, 'color': text_color},
-            bgcolor="rgba(0,0,0,0)"
-        ),
-        hoverlabel=dict(
-            bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=11,
-            font_family="Roboto Condensed"
-        ),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font={'family':'Roboto Condensed','color':TICK_COLOR},
+        height=CHART_H,
+        margin=dict(l=48, r=10, t=30, b=48),
+        xaxis=dict(gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   tickangle=-45, fixedrange=True),
+        yaxis=dict(gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   fixedrange=True),
+        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+                    font={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)"),
+        hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
-        modebar={'remove': ['zoom', 'pan', 'select', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']}
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
-    
     return fig
 
 # ============================================
