@@ -501,9 +501,9 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     return fig
 
 # ============================================
-# GRÁFICO: Gastos por Día (NUEVO)
-# Línea sin puntos, todos los días del mes en eje X,
-# colores de escala según monto, hover interactivo
+# GRÁFICO: Gastos por Día
+# Línea sin puntos, hover individual por día,
+# eje X con números del 1 al N del mes
 # ============================================
 def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     tema   = st.get_option("theme.base")
@@ -522,96 +522,62 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     else:
         valores = [0.0] * dias_en_mes
 
-    # Escala de color: verde → amarillo → naranja → rosa según intensidad
     max_val = max(valores) if max(valores) > 0 else 1
 
-    def color_por_intensidad(val, max_v):
-        ratio = val / max_v if max_v > 0 else 0
-        if ratio == 0:
-            return TICK_COLOR
-        elif ratio <= 0.33:
-            return COLORS['cian']
-        elif ratio <= 0.66:
-            return COLORS['naranja']
-        else:
-            return COLORS['rosa']
-
-    colores_puntos = [color_por_intensidad(v, max_val) for v in valores]
-
-    # Texto para hover
+    # Texto de hover: solo 1 día a la vez, con desglose por categoría
     hover_texts = []
     for d, v in zip(todos_dias, valores):
         if v > 0:
-            # Detalle de categorías para ese día
             detalle = gastos[gastos['Dia'] == d].groupby('Categoría')['Monto'].sum()
-            lineas  = [f"&nbsp;&nbsp;{cat}: ${monto:,.0f}" for cat, monto in detalle.items()]
+            lineas  = [f"{cat}: ${monto:,.0f}" for cat, monto in detalle.items()]
             detalle_str = "<br>".join(lineas)
             hover_texts.append(f"<b>Día {d}</b><br>Total: ${v:,.0f}<br>{detalle_str}")
         else:
             hover_texts.append(f"<b>Día {d}</b><br>Sin gastos")
 
+    y_max = max_val * 1.40 if max_val > 0 else 100
+
     fig = go.Figure()
 
-    # Área suave bajo la línea para dar profundidad visual
+    # Área relleno suave bajo la curva
     fig.add_trace(go.Scatter(
-        x=todos_dias, y=valores,
+        x=todos_dias,
+        y=valores,
         mode='lines',
         fill='tozeroy',
-        fillcolor='rgba(0,129,255,0.06)',
+        fillcolor='rgba(0,129,255,0.07)',
         line=dict(color='rgba(0,0,0,0)', width=0),
         showlegend=False,
         hoverinfo='skip',
     ))
 
-    # Línea principal sin marcadores
+    # Línea principal — SIN marcadores, hover individual por punto (closest)
     fig.add_trace(go.Scatter(
         x=todos_dias,
         y=valores,
         mode='lines',
-        name='Gasto diario',
-        line=dict(color=COLORS['azul'], width=2, shape='spline', smoothing=0.6),
-        marker=dict(size=0),
+        line=dict(color=COLORS['azul'], width=2, shape='spline', smoothing=0.5),
         text=hover_texts,
         hovertemplate='%{text}<extra></extra>',
         showlegend=False,
     ))
 
-    # Puntos visibles solo en días con gasto (sin círculo, solo un punto fino)
-    dias_con_gasto  = [d for d, v in zip(todos_dias, valores) if v > 0]
-    vals_con_gasto  = [v for v in valores if v > 0]
-    colores_validos = [color_por_intensidad(v, max_val) for v in vals_con_gasto]
-
-    if dias_con_gasto:
-        fig.add_trace(go.Scatter(
-            x=dias_con_gasto,
-            y=vals_con_gasto,
-            mode='markers',
-            marker=dict(
-                size=6,
-                color=colores_validos,
-                line=dict(width=0),
-                symbol='circle',
-            ),
-            text=[hover_texts[d-1] for d in dias_con_gasto],
-            hovertemplate='%{text}<extra></extra>',
-            showlegend=False,
-        ))
-
-    y_max = max_val * 1.35 if max_val > 0 else 100
-
+    # Determinar paso del tick para que no se amontonen los números
+    # Mostrar cada día si ≤ 31, pero con tamaño pequeño y sin inclinación
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=52, r=12, t=10, b=40),
+        margin=dict(l=52, r=12, t=10, b=36),
         xaxis=dict(
             showgrid=False,
             tickmode='array',
             tickvals=todos_dias,
             ticktext=[str(d) for d in todos_dias],
-            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': TICK_COLOR},
             fixedrange=True,
             zeroline=False,
+            range=[0.5, dias_en_mes + 0.5],
         ),
         yaxis=dict(
             showgrid=True,
@@ -621,11 +587,12 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
             range=[0, y_max],
             zeroline=False,
         ),
-        hovermode='x unified',
+        # closest = muestra solo el tooltip del punto más cercano al cursor
+        hovermode='closest',
         hoverlabel=dict(
             bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=11,
-            font_family='Roboto Condensed',
+            bordercolor=COLORS['azul'],
+            font=dict(size=11, family='Roboto Condensed', color='#333333'),
         ),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
