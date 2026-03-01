@@ -407,7 +407,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
     label_y = ['Ingresos']
 
     fig = go.Figure()
-    for cat, color in zip(cats_ingreso, colores_cats):
+    for rank, (cat, color) in enumerate(zip(cats_ingreso, colores_cats)):
         val          = valores[cat]
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
@@ -417,6 +417,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{cat}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
+            legendrank=rank + 1,
         ))
 
     if total > 0:
@@ -462,7 +463,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     label_y = ['Resumen']
 
     fig = go.Figure()
-    for nombre, val, color in segmentos:
+    for rank, (nombre, val, color) in enumerate(segmentos):
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
             name=nombre, y=label_y, x=[val], orientation='h',
@@ -471,6 +472,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{nombre}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
+            legendrank=rank + 1,
         ))
 
     x_fin = gasto_val + ahorro_val
