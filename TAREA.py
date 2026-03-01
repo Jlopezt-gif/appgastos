@@ -1044,7 +1044,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
+    chart_title(f"Presupuestos vs Gastos Mensuales — {año_seleccionado}")
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
     render_lineas_chart_mobile(fig_lineas, "lineas_presupuesto")
 
