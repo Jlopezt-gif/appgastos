@@ -386,7 +386,7 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 TICK_COLOR = "#999999"
 GRID_COLOR_LIGHT = "#E8E8E8"
 GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
-CHART_H = 320            # altura reducida para que quepan con holgura
+CHART_H = 240            # altura reducida para que quepan con holgura
 
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     tema = st.get_option("theme.base")
@@ -527,7 +527,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=3, color=COLORS['azul']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=12, color=COLORS['azul']),   # ← color azul
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['azul']),   # ← color azul
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
     fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
@@ -536,7 +536,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         marker=dict(size=3, color=COLORS['rosa']),
         text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
         textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=12, color=COLORS['rosa']),   # ← color rosa
+        textfont=dict(family='Roboto Condensed', size=8, color=COLORS['rosa']),   # ← color rosa
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
@@ -544,19 +544,15 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=42, r=8, t=30, b=82),   # ← b de 42 → 62
-        xaxis=dict(
-            gridcolor=grid_c,
-            tickfont={'family':'Roboto Condensed','size':14,'color':TICK_COLOR},
-            tickangle=-45,
-            fixedrange=True,
-            automargin=True
-        ),
+        margin=dict(l=42, r=8, t=26, b=62),   # ← b de 42 → 62
+        xaxis=dict(gridcolor=grid_c,
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                   tickangle=-45, fixedrange=True),
         yaxis=dict(gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
+                   tickfont={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
+                    font={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)"),
         hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
