@@ -386,12 +386,12 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 TICK_COLOR = "#999999"
 GRID_COLOR_LIGHT = "#E8E8E8"
 GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
-CHART_H = 320            # altura aumentada para que no se corten las etiquetas de meses
+CHART_H = 320
 
 # ── Tamaños de fuente unificados ──────────────────────────────────────────────
-FONT_AXIS  = 12   # ticks de ejes X e Y
-FONT_LABEL = 12   # etiquetas de datos sobre barras / líneas
-FONT_GAUGE_TICK = 12   # ticks del gauge
+FONT_AXIS  = 12
+FONT_LABEL = 12
+FONT_GAUGE_TICK = 12
 # ─────────────────────────────────────────────────────────────────────────────
 
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
@@ -514,7 +514,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
-    bg_label = "rgba(255,255,255,0.85)" if tema != "dark" else "rgba(30,37,48,0.85)"
+    bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
 
     df_año = df[df['Año'] == año_filtro].copy()
     meses_n = list(range(1, 13))
@@ -540,9 +540,8 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
-    # Anotaciones con fondo para presupuestos
     annotations = []
-    for i, (mes, val) in enumerate(zip(meses_l, presupuestos)):
+    for mes, val in zip(meses_l, presupuestos):
         if val > 0:
             annotations.append(dict(
                 x=mes, y=val,
@@ -553,8 +552,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
                 bgcolor=bg_label,
                 borderpad=2,
             ))
-    # Anotaciones con fondo para gastos
-    for i, (mes, val) in enumerate(zip(meses_l, gastos_list)):
+    for mes, val in zip(meses_l, gastos_list):
         if val > 0:
             annotations.append(dict(
                 x=mes, y=val,
@@ -591,7 +589,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
 def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
-    bg_label = "rgba(255,255,255,0.85)" if tema != "dark" else "rgba(30,37,48,0.85)"
+    bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
 
     df_año  = df[df['Año'] == año_filtro].copy()
     meses_n = list(range(1, 13))
@@ -617,7 +615,6 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
 
-    # Anotaciones con fondo para ingresos
     annotations = []
     for mes, val in zip(meses_l, ingresos):
         if val > 0:
@@ -630,7 +627,6 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
                 bgcolor=bg_label,
                 borderpad=2,
             ))
-    # Anotaciones con fondo para gastos
     for mes, val in zip(meses_l, gastos_l):
         if val > 0:
             annotations.append(dict(
