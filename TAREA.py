@@ -910,7 +910,7 @@ with col1:
     st.plotly_chart(crear_stacked_ingresos_categoria(df_filtrado),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 with col2:
-    chart_title("Resumen del Mes — Ingreso / Gasto / Ahorro")
+    chart_title("Detalle de las Finanzas")
     st.plotly_chart(crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
