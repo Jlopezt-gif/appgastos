@@ -384,8 +384,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     return fig
 
 # ============================================
-# NUEVO GRÁFICO: Ingresos por Categoría
-# Stacked horizontal — una barra con Sueldo / Negocio / Otro Ingreso
+# GRÁFICO: Ingresos por Categoría (stacked horizontal)
 # ============================================
 def crear_stacked_ingresos_categoria(df_filtrado):
     tema   = st.get_option("theme.base")
@@ -393,45 +392,37 @@ def crear_stacked_ingresos_categoria(df_filtrado):
 
     ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
 
-    cats_ingreso  = ['Sueldo', 'Negocio', 'Otro Ingreso']
-    colores_cats  = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
+    cats_ingreso = ['Sueldo', 'Negocio', 'Otro Ingreso']
+    colores_cats = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
 
     if len(ingresos) > 0:
         por_cat = ingresos.groupby('Categoría')['Monto'].sum()
         valores = {cat: float(por_cat.get(cat, 0)) for cat in cats_ingreso}
-        # Categorías desconocidas → absorber en "Otro Ingreso"
         for cat_real, monto in por_cat.items():
             if cat_real not in cats_ingreso:
                 valores['Otro Ingreso'] += float(monto)
     else:
         valores = {cat: 0 for cat in cats_ingreso}
 
-    total    = sum(valores.values())
-    label_y  = ['Ingresos']
+    total   = sum(valores.values())
+    label_y = ['Ingresos']
 
     fig = go.Figure()
     for cat, color in zip(cats_ingreso, colores_cats):
-        val = valores[cat]
+        val          = valores[cat]
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
-            name=cat,
-            y=label_y,
-            x=[val],
-            orientation='h',
+            name=cat, y=label_y, x=[val], orientation='h',
             marker=dict(color=color, opacity=0.93, line=dict(width=0)),
-            text=[texto_inside],
-            textposition='inside',
-            insidetextanchor='middle',
+            text=[texto_inside], textposition='inside', insidetextanchor='middle',
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{cat}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
         ))
 
-    # Etiqueta total fuera de la barra
     if total > 0:
         fig.add_annotation(
-            x=total, y=0,
-            text=f'  Total: ${total:,.0f}',
+            x=total, y=0, text=f'  Total: ${total:,.0f}',
             showarrow=False, xanchor='left',
             font=dict(family='Roboto Condensed', size=FONT_LABEL, color=TICK_COLOR),
         )
@@ -440,25 +431,20 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H,
-        margin=dict(l=12, r=90, t=28, b=20),
+        height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False),
-        yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
-                   fixedrange=True),
+        yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
-                    bgcolor="rgba(0,0,0,0)"),
-        hovermode='y unified',
-        dragmode=False,
+                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
+        hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
     return fig
 
 # ============================================
-# NUEVO GRÁFICO: Resumen Ingreso / Gasto / Ahorro
-# Stacked horizontal — una barra con los 3 valores del mes
+# GRÁFICO: Detalle de las Finanzas — Ingreso / Gasto / Ahorro (stacked horizontal)
 # ============================================
 def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     tema   = st.get_option("theme.base")
@@ -466,7 +452,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
 
     ingreso_val = float(df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum())
     gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())
-    ahorro_val  = max(float(presupuesto_disponible), 0)   # 0 si hay déficit
+    ahorro_val  = max(float(presupuesto_disponible), 0)
 
     segmentos = [
         ('Ingreso', ingreso_val, COLORS['cian']),
@@ -480,20 +466,14 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     for nombre, val, color in segmentos:
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
-            name=nombre,
-            y=label_y,
-            x=[val],
-            orientation='h',
+            name=nombre, y=label_y, x=[val], orientation='h',
             marker=dict(color=color, opacity=0.93, line=dict(width=0)),
-            text=[texto_inside],
-            textposition='inside',
-            insidetextanchor='middle',
+            text=[texto_inside], textposition='inside', insidetextanchor='middle',
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{nombre}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
         ))
 
-    # Etiqueta de ahorro / déficit al final
     x_fin = gasto_val + ahorro_val
     if presupuesto_disponible < 0:
         lbl_txt   = f'  ⚠ Déficit: ${abs(presupuesto_disponible):,.0f}'
@@ -504,8 +484,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
 
     if x_fin > 0:
         fig.add_annotation(
-            x=x_fin, y=0,
-            text=lbl_txt,
+            x=x_fin, y=0, text=lbl_txt,
             showarrow=False, xanchor='left',
             font=dict(family='Roboto Condensed', size=FONT_LABEL, color=lbl_color),
         )
@@ -514,18 +493,14 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H,
-        margin=dict(l=12, r=120, t=28, b=20),
+        height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False),
-        yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
-                   fixedrange=True),
+        yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
-                    bgcolor="rgba(0,0,0,0)"),
-        hovermode='y unified',
-        dragmode=False,
+                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
+        hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
     return fig
@@ -538,9 +513,9 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     grid_c   = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
     bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
 
-    df_año   = df[df['Año'] == año_filtro].copy()
-    meses_n  = list(range(1, 13))
-    meses_l  = [MESES[m] for m in meses_n]
+    df_año  = df[df['Año'] == año_filtro].copy()
+    meses_n = list(range(1, 13))
+    meses_l = [MESES[m] for m in meses_n]
 
     presupuestos = [obtener_ultimo_presupuesto_mes(df_año, año_filtro, m) for m in meses_n]
     gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
@@ -580,8 +555,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
-        annotations=annotations,
-        hovermode='x unified',
+        annotations=annotations, hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
@@ -638,8 +612,7 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
-        annotations=annotations,
-        hovermode='x unified',
+        annotations=annotations, hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
@@ -880,14 +853,14 @@ with col5:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# ── Helper título ────────────────────────────────────────────────────────────
+# ── Helper título ─────────────────────────────────────────────────────────────
 def chart_title(texto):
     st.markdown(
         f"<h4 style='font-weight:500;margin:0 0 4px 0;font-size:18px;'>{texto}</h4>",
         unsafe_allow_html=True)
 
 # ============================================
-# FILA 1: Gauge | Barras Gastos por Categoría
+# FILA 1: Cumplimiento del Presupuesto | Detalle de las Finanzas
 # ============================================
 col1, col2 = st.columns(2)
 with col1:
@@ -895,23 +868,23 @@ with col1:
     st.plotly_chart(crear_gauge_presupuesto(df_filtrado, presupuesto_mes),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 with col2:
-    chart_title("Gastos por Categoría")
-    st.plotly_chart(crear_barras_horizontales_categorias(df_filtrado),
+    chart_title("Detalle de las Finanzas")
+    st.plotly_chart(crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# FILA 2 (NUEVA): Ingresos por Cat | Resumen Mes
+# FILA 2: Gastos por Categoría | Ingresos por Categoría
 # ============================================
 col1, col2 = st.columns(2)
 with col1:
-    chart_title("Ingresos por Categoría")
-    st.plotly_chart(crear_stacked_ingresos_categoria(df_filtrado),
+    chart_title("Gastos por Categoría")
+    st.plotly_chart(crear_barras_horizontales_categorias(df_filtrado),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 with col2:
-    chart_title("Detalle de las Finanzas")
-    st.plotly_chart(crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible),
+    chart_title("Ingresos por Categoría")
+    st.plotly_chart(crear_stacked_ingresos_categoria(df_filtrado),
                     use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
 
 st.markdown("<br>", unsafe_allow_html=True)
