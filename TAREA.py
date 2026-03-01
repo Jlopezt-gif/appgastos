@@ -385,14 +385,12 @@ def crear_barras_horizontales_categorias(df_filtrado):
 
 # ============================================
 # GRÁFICO: Ingresos por Categoría (stacked horizontal)
-# ✅ MODIFICADO: leyenda más pequeña en 1 línea + margen inferior ampliado
+# ✅ Orden leyenda: Sueldo → Negocio → Otro Ingreso | Sin eje X | Sin grilla
 # ============================================
 def crear_stacked_ingresos_categoria(df_filtrado):
-    tema   = st.get_option("theme.base")
-    grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
-
     ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
 
+    # Orden explícito: Sueldo, Negocio, Otro Ingreso
     cats_ingreso = ['Sueldo', 'Negocio', 'Otro Ingreso']
     colores_cats = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
 
@@ -432,14 +430,11 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        # ✅ margen inferior aumentado de 20 → 40
-        height=CHART_H, margin=dict(l=12, r=90, t=28, b=40),
-        xaxis=dict(showgrid=True, gridcolor=grid_c,
-                   # ✅ fuente del eje X reducida a 10
-                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
-                   fixedrange=True, zeroline=False),
+        height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
+        # ✅ Eje X completamente oculto, sin grilla
+        xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        # ✅ leyenda más compacta: size 9, itemwidth reducido, sin gap entre grupos
+        # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
@@ -450,16 +445,14 @@ def crear_stacked_ingresos_categoria(df_filtrado):
 
 # ============================================
 # GRÁFICO: Detalle de las Finanzas — Ingreso / Gasto / Ahorro (stacked horizontal)
-# ✅ MODIFICADO: leyenda más pequeña en 1 línea + margen inferior ampliado
+# ✅ Orden leyenda: Ingreso → Gasto → Ahorro | Sin eje X | Sin grilla
 # ============================================
 def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
-    tema   = st.get_option("theme.base")
-    grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
-
     ingreso_val = float(df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum())
     gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())
     ahorro_val  = max(float(presupuesto_disponible), 0)
 
+    # Orden explícito: Ingreso, Gasto, Ahorro
     segmentos = [
         ('Ingreso', ingreso_val, COLORS['cian']),
         ('Gasto',   gasto_val,   COLORS['rosa']),
@@ -499,14 +492,11 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        # ✅ margen inferior aumentado de 20 → 40
-        height=CHART_H, margin=dict(l=12, r=120, t=28, b=40),
-        xaxis=dict(showgrid=True, gridcolor=grid_c,
-                   # ✅ fuente del eje X reducida a 10
-                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
-                   fixedrange=True, zeroline=False),
+        height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
+        # ✅ Eje X completamente oculto, sin grilla
+        xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        # ✅ leyenda más compacta: size 9, itemwidth reducido, sin gap entre grupos
+        # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
