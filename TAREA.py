@@ -514,6 +514,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
 def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+    bg_label = "rgba(255,255,255,0.85)" if tema != "dark" else "rgba(30,37,48,0.85)"
 
     df_año = df[df['Año'] == año_filtro].copy()
     meses_n = list(range(1, 13))
@@ -523,27 +524,47 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
 
     max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
-    y_max = max_v * 1.30
+    y_max = max_v * 1.35
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers+text',
+    fig.add_trace(go.Scatter(x=meses_l, y=presupuestos, mode='lines+markers',
         name='Presupuesto',
         line=dict(color=COLORS['azul'], width=1),
         marker=dict(size=4, color=COLORS['azul']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in presupuestos],
-        textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['azul']),
         hovertemplate='<b>%{x}</b><br>Presupuesto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
-    fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers+text',
+    fig.add_trace(go.Scatter(x=meses_l, y=gastos_list, mode='lines+markers',
         name='Gasto',
         line=dict(color=COLORS['rosa'], width=1),
         marker=dict(size=4, color=COLORS['rosa']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_list],
-        textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['rosa']),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
+
+    # Anotaciones con fondo para presupuestos
+    annotations = []
+    for i, (mes, val) in enumerate(zip(meses_l, presupuestos)):
+        if val > 0:
+            annotations.append(dict(
+                x=mes, y=val,
+                text=f'${val:,.0f}',
+                showarrow=False,
+                yshift=14,
+                font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['azul']),
+                bgcolor=bg_label,
+                borderpad=2,
+            ))
+    # Anotaciones con fondo para gastos
+    for i, (mes, val) in enumerate(zip(meses_l, gastos_list)):
+        if val > 0:
+            annotations.append(dict(
+                x=mes, y=val,
+                text=f'${val:,.0f}',
+                showarrow=False,
+                yshift=14,
+                font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['rosa']),
+                bgcolor=bg_label,
+                borderpad=2,
+            ))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
@@ -559,6 +580,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)"),
+        annotations=annotations,
         hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
@@ -569,6 +591,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
 def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+    bg_label = "rgba(255,255,255,0.85)" if tema != "dark" else "rgba(30,37,48,0.85)"
 
     df_año  = df[df['Año'] == año_filtro].copy()
     meses_n = list(range(1, 13))
@@ -578,27 +601,47 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
     gastos_l = [df_año[(df_año['Tipo']=='Gasto') &(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
 
     max_v = max(max(ingresos), max(gastos_l)) if any(ingresos) or any(gastos_l) else 100
-    y_max = max_v * 1.30
+    y_max = max_v * 1.35
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=meses_l, y=ingresos, mode='lines+markers+text',
+    fig.add_trace(go.Scatter(x=meses_l, y=ingresos, mode='lines+markers',
         name='Ingreso',
         line=dict(color=COLORS['cian'], width=1),
         marker=dict(size=4, color=COLORS['cian']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in ingresos],
-        textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['cian']),
         hovertemplate='<b>%{x}</b><br>Ingreso: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
-    fig.add_trace(go.Scatter(x=meses_l, y=gastos_l, mode='lines+markers+text',
+    fig.add_trace(go.Scatter(x=meses_l, y=gastos_l, mode='lines+markers',
         name='Gasto',
         line=dict(color=COLORS['naranja'], width=1),
         marker=dict(size=4, color=COLORS['naranja']),
-        text=[f'${v:,.0f}' if v > 0 else '' for v in gastos_l],
-        textposition='top center',
-        textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['naranja']),
         hovertemplate='<b>%{x}</b><br>Gasto: $%{y:,.0f}<extra></extra>',
         cliponaxis=False))
+
+    # Anotaciones con fondo para ingresos
+    annotations = []
+    for mes, val in zip(meses_l, ingresos):
+        if val > 0:
+            annotations.append(dict(
+                x=mes, y=val,
+                text=f'${val:,.0f}',
+                showarrow=False,
+                yshift=14,
+                font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['cian']),
+                bgcolor=bg_label,
+                borderpad=2,
+            ))
+    # Anotaciones con fondo para gastos
+    for mes, val in zip(meses_l, gastos_l):
+        if val > 0:
+            annotations.append(dict(
+                x=mes, y=val,
+                text=f'${val:,.0f}',
+                showarrow=False,
+                yshift=14,
+                font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['naranja']),
+                bgcolor=bg_label,
+                borderpad=2,
+            ))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
@@ -614,6 +657,7 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)"),
+        annotations=annotations,
         hovermode='x unified',
         hoverlabel=dict(bgcolor="white" if tema!="dark" else "#1F2937", font_size=11),
         dragmode=False,
