@@ -3,6 +3,7 @@ import streamlit.components.v1 as components
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+import plotly.io as pio
 from datetime import datetime
 import requests
 from io import BytesIO
@@ -571,7 +572,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         margin=dict(l=52, r=8, t=28, b=90),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
-                   tickangle=-45, fixedrange=True),
+                   tickangle=-45, fixedrange=False),
         yaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
@@ -646,7 +647,7 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         margin=dict(l=52, r=8, t=28, b=90),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
-                   tickangle=-45, fixedrange=True),
+                   tickangle=-45, fixedrange=False),
         yaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
@@ -660,6 +661,85 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
     return fig
+
+# ============================================
+# HELPER: renderizar gráfico de líneas con
+#         scroll horizontal en móvil
+# ============================================
+def render_lineas_chart_mobile(fig, chart_id):
+    """
+    Desktop (>768px): se comporta igual que st.plotly_chart normal.
+    Móvil  (≤768px) : el gráfico tiene ancho fijo 900px dentro de un
+                      contenedor con scroll horizontal táctil.
+    El estilo del recuadro replica el de div[data-testid="stPlotlyChart"].
+    """
+    tema = st.get_option("theme.base")
+
+    # Colores del recuadro según tema
+    if tema == "dark":
+        box_bg      = "#1e2530"
+        box_border  = "#4A5568"
+    else:
+        box_bg      = "#FFFFFF"
+        box_border  = "#E2E8F0"
+
+    fig_html = pio.to_html(
+        fig,
+        full_html=False,
+        include_plotlyjs='cdn',
+        config={'displayModeBar': False, 'staticPlot': True}
+    )
+
+    html_content = f"""
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+      /* ── Recuadro exterior (igual al chart-box de Streamlit) ── */
+      .chart-box-{chart_id} {{
+        background-color: {box_bg};
+        border-radius: 12px;
+        border: 1px solid {box_border};
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+        padding: 12px 12px 8px 12px;
+        margin-bottom: 4px;
+        width: 100%;
+        box-sizing: border-box;
+      }}
+
+      /* ── Contenedor de scroll ── */
+      .chart-scroll-{chart_id} {{
+        width: 100%;
+        box-sizing: border-box;
+      }}
+
+      /* ── Div interior del gráfico ── */
+      .chart-inner-{chart_id} {{
+        width: 100%;
+      }}
+
+      /* ── Móvil: activar scroll horizontal, fijar ancho del gráfico ── */
+      @media (max-width: 768px) {{
+        .chart-scroll-{chart_id} {{
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }}
+        .chart-inner-{chart_id} {{
+          min-width: 900px;
+          width: 900px;
+        }}
+      }}
+    </style>
+
+    <div class="chart-box-{chart_id}">
+      <div class="chart-scroll-{chart_id}">
+        <div class="chart-inner-{chart_id}">
+          {fig_html}
+        </div>
+      </div>
+    </div>
+    """
+    # Altura del iframe = alto del gráfico + padding del recuadro
+    components.html(html_content, height=CHART_H + 40, scrolling=False)
+
 
 # ============================================
 # APLICACIÓN PRINCIPAL
@@ -931,6 +1011,7 @@ def chart_title(texto):
 
 # ============================================
 # GRÁFICOS — fila 1
+# (gauge y barras: sin cambios, se quedan con st.plotly_chart)
 # ============================================
 
 col1, col2 = st.columns(2)
@@ -949,6 +1030,8 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
 # GRÁFICOS — fila 2
+# (líneas: usan render_lineas_chart_mobile para
+#  scroll horizontal en móvil)
 # ============================================
 
 col1, col2 = st.columns(2)
@@ -956,12 +1039,12 @@ col1, col2 = st.columns(2)
 with col1:
     chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
-    st.plotly_chart(fig_lineas, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    render_lineas_chart_mobile(fig_lineas, "lineas_presupuesto")
 
 with col2:
     chart_title(f"Ingresos vs Gastos Mensuales — {año_seleccionado}")
     fig_barras_v = crear_lineas_ingreso_gasto_mensual(df, año_seleccionado)
-    st.plotly_chart(fig_barras_v, use_container_width=True, config={'displayModeBar': False, 'staticPlot': True})
+    render_lineas_chart_mobile(fig_barras_v, "lineas_ingreso")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
