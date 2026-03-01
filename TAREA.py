@@ -183,7 +183,7 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         padding: 12px 12px 8px 12px;
         margin-bottom: 4px;
-        overflow: hidden;
+        overflow: visible;
     }
     /* Forzar que el SVG interno no desborde */
     div[data-testid="stPlotlyChart"] svg {
