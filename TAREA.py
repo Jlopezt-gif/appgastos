@@ -597,9 +597,9 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     return fig
 
 # ============================================
-# GRÁFICO: Ahorro por Mes — línea anual con scroll (NUEVO)
+# GRÁFICO: Ahorro por Mes — línea anual con scroll
 # Misma estructura que crear_lineas_presupuesto_gasto_anual
-# Línea de 0 visible, colores: verde=ahorro / rosa=déficit
+# Línea de 0 visible, azul=ahorro / rosa=déficit
 # ============================================
 def crear_lineas_ahorro_mensual(df, año_filtro):
     tema     = st.get_option("theme.base")
@@ -617,45 +617,42 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             (df['Año'] == año_filtro) &
             (df['Mes'] == m)
         ]['Monto'].sum()
-        # Solo calculamos ahorro si hubo presupuesto ese mes
         if pres > 0:
             ahorros.append(float(pres - gasto))
         else:
             ahorros.append(None)
 
-    # Separar positivos y negativos para colorear distinto
-    ahorros_pos  = [v if (v is not None and v >= 0) else None for v in ahorros]
-    ahorros_neg  = [v if (v is not None and v < 0)  else None for v in ahorros]
+    # Separar positivos y negativos
+    ahorros_pos = [v if (v is not None and v >= 0) else None for v in ahorros]
+    ahorros_neg = [v if (v is not None and v < 0)  else None for v in ahorros]
 
-    # Rango Y
+    # Rango Y con espacio generoso arriba para etiquetas
     vals_validos = [v for v in ahorros if v is not None]
     if vals_validos:
-        min_v = min(vals_validos)
-        max_v = max(vals_validos)
-        padding = max(abs(max_v), abs(min_v)) * 0.35
-        y_min = min(min_v - padding, -padding * 0.3)
-        y_max = max_v + padding
+        min_v   = min(vals_validos)
+        max_v   = max(vals_validos)
+        abs_max = max(abs(min_v), abs(max_v))
+        padding = abs_max * 0.45
+        y_min   = min(min_v - padding, -abs_max * 0.15)
+        y_max   = max_v + padding
     else:
-        y_min, y_max = -100, 100
+        y_min, y_max = -500, 500
 
     fig = go.Figure()
 
-    # Línea de 0
+    # Línea horizontal en 0
     fig.add_hline(
         y=0,
         line=dict(color=TICK_COLOR, width=1, dash='dot'),
-        annotation_text="0",
-        annotation_font=dict(family='Roboto Condensed', size=10, color=TICK_COLOR),
-        annotation_position="left",
     )
 
-    # Línea ahorro positivo (verde/cian)
+    # Línea ahorro positivo (azul)
     fig.add_trace(go.Scatter(
         x=meses_l, y=ahorros_pos,
         mode='lines+markers',
         name='Ahorro',
         line=dict(color=COLORS['azul'], width=1),
-        marker=dict(size=4, color=COLORS['azul']),
+        marker=dict(size=5, color=COLORS['azul']),
         connectgaps=False,
         hovertemplate='<b>%{x}</b><br>Ahorro: $%{y:,.0f}<extra></extra>',
         cliponaxis=False,
@@ -667,30 +664,34 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
         mode='lines+markers',
         name='Déficit',
         line=dict(color=COLORS['rosa'], width=1),
-        marker=dict(size=4, color=COLORS['rosa']),
+        marker=dict(size=5, color=COLORS['rosa']),
         connectgaps=False,
         hovertemplate='<b>%{x}</b><br>Déficit: $%{y:,.0f}<extra></extra>',
         cliponaxis=False,
     ))
 
-    # Etiquetas de valor (mismo estilo que crear_lineas_presupuesto_gasto_anual)
+    # Etiquetas — arriba del punto si positivo, debajo si negativo
     annotations = []
     for mes, val in zip(meses_l, ahorros):
         if val is None:
             continue
         color_lbl = COLORS['azul'] if val >= 0 else COLORS['rosa']
+        yshift    = 16 if val >= 0 else -16
         annotations.append(dict(
             x=mes, y=val,
             text=f'${val:,.0f}',
-            showarrow=False, yshift=14,
+            showarrow=False,
+            yshift=yshift,
+            xanchor='center',
             font=dict(family='Roboto Condensed', size=FONT_LABEL, color=color_lbl),
-            bgcolor=bg_label, borderpad=2,
+            bgcolor=bg_label,
+            borderpad=2,
         ))
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=52, r=8, t=28, b=90),
+        height=CHART_H, margin=dict(l=60, r=8, t=28, b=90),
         xaxis=dict(
             showgrid=False,
             tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
