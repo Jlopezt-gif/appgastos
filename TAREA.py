@@ -570,10 +570,10 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
         margin=dict(l=52, r=8, t=28, b=90),
-        xaxis=dict(gridcolor=grid_c,
+        xaxis=dict(showgrid=False,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=False),
-        yaxis=dict(gridcolor=grid_c,
+        yaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
@@ -645,10 +645,10 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
         margin=dict(l=52, r=8, t=28, b=90),
-        xaxis=dict(gridcolor=grid_c,
+        xaxis=dict(showgrid=False,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=False),
-        yaxis=dict(gridcolor=grid_c,
+        yaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
@@ -671,18 +671,9 @@ def render_lineas_chart_mobile(fig, chart_id):
     Desktop (>768px): se comporta igual que st.plotly_chart normal.
     Móvil  (≤768px) : el gráfico tiene ancho fijo 900px dentro de un
                       contenedor con scroll horizontal táctil.
-    El estilo del recuadro replica el de div[data-testid="stPlotlyChart"].
+    El fondo se adapta automáticamente al modo claro/oscuro del dispositivo
+    usando @media (prefers-color-scheme: dark) dentro del iframe.
     """
-    tema = st.get_option("theme.base")
-
-    # Colores del recuadro según tema
-    if tema == "dark":
-        box_bg      = "#1e2530"
-        box_border  = "#4A5568"
-    else:
-        box_bg      = "#FFFFFF"
-        box_border  = "#E2E8F0"
-
     fig_html = pio.to_html(
         fig,
         full_html=False,
@@ -693,16 +684,32 @@ def render_lineas_chart_mobile(fig, chart_id):
     html_content = f"""
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-      /* ── Recuadro exterior (igual al chart-box de Streamlit) ── */
+      /* ── Reset base del iframe ── */
+      html, body {{
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }}
+
+      /* ── Recuadro exterior — modo CLARO ── */
       .chart-box-{chart_id} {{
-        background-color: {box_bg};
+        background-color: #FFFFFF;
         border-radius: 12px;
-        border: 1px solid {box_border};
+        border: 1px solid #E2E8F0;
         box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
         padding: 12px 12px 8px 12px;
         margin-bottom: 4px;
         width: 100%;
         box-sizing: border-box;
+      }}
+
+      /* ── Recuadro exterior — modo OSCURO ── */
+      @media (prefers-color-scheme: dark) {{
+        .chart-box-{chart_id} {{
+          background-color: #1e2530;
+          border: 1px solid #4A5568;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+        }}
       }}
 
       /* ── Contenedor de scroll ── */
