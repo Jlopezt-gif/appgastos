@@ -386,7 +386,7 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 TICK_COLOR = "#999999"
 GRID_COLOR_LIGHT = "#E8E8E8"
 GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
-CHART_H = 240            # altura reducida para que quepan con holgura
+CHART_H = 320            # altura reducida para que quepan con holgura
 
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     tema = st.get_option("theme.base")
