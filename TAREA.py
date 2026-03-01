@@ -568,13 +568,13 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=52, r=12, t=10, b=36),
+        margin=dict(l=52, r=32, t=10, b=36),
         xaxis=dict(
             showgrid=False,
             showticklabels=False,
             fixedrange=True,
             zeroline=False,
-            range=[0.5, dias_en_mes + 0.5],
+            range=[0.5, dias_en_mes + 2],
         ),
         yaxis=dict(
             showgrid=True,
