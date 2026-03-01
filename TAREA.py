@@ -407,7 +407,17 @@ def crear_stacked_ingresos_categoria(df_filtrado):
     label_y = ['Ingresos']
 
     fig = go.Figure()
-    for rank, (cat, color) in enumerate(zip(cats_ingreso, colores_cats)):
+
+    # Traces fantasma SÓLO para controlar el orden de la leyenda (Sueldo → Negocio → Otro Ingreso)
+    for cat, color in zip(cats_ingreso, colores_cats):
+        fig.add_trace(go.Bar(
+            name=cat, x=[0], y=label_y, orientation='h',
+            marker=dict(color=color, opacity=0),
+            showlegend=True, hoverinfo='skip',
+        ))
+
+    # Traces reales SIN leyenda propia
+    for cat, color in zip(cats_ingreso, colores_cats):
         val          = valores[cat]
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
@@ -417,7 +427,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{cat}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
-            legendrank=rank + 1,
+            showlegend=False,
         ))
 
     if total > 0:
@@ -432,10 +442,8 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
-        # ✅ Eje X completamente oculto, sin grilla
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
@@ -463,7 +471,17 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     label_y = ['Resumen']
 
     fig = go.Figure()
-    for rank, (nombre, val, color) in enumerate(segmentos):
+
+    # Traces fantasma SÓLO para controlar el orden de la leyenda (Ingreso → Gasto → Ahorro)
+    for nombre, val, color in segmentos:
+        fig.add_trace(go.Bar(
+            name=nombre, x=[0], y=label_y, orientation='h',
+            marker=dict(color=color, opacity=0),
+            showlegend=True, hoverinfo='skip',
+        ))
+
+    # Traces reales SIN leyenda propia
+    for nombre, val, color in segmentos:
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
             name=nombre, y=label_y, x=[val], orientation='h',
@@ -472,7 +490,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{nombre}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
-            legendrank=rank + 1,
+            showlegend=False,
         ))
 
     x_fin = gasto_val + ahorro_val
