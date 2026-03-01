@@ -390,6 +390,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
 def crear_stacked_ingresos_categoria(df_filtrado):
     ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
 
+    # Orden explícito: Sueldo, Negocio, Otro Ingreso
     cats_ingreso = ['Sueldo', 'Negocio', 'Otro Ingreso']
     colores_cats = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
 
@@ -406,8 +407,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
     label_y = ['Ingresos']
 
     fig = go.Figure()
-
-    for cat, color in zip(cats_ingreso, colores_cats):
+    for rank, (cat, color) in enumerate(zip(cats_ingreso, colores_cats)):
         val          = valores[cat]
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
@@ -417,7 +417,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{cat}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
-            showlegend=False,
+            legendrank=rank + 1,
         ))
 
     if total > 0:
@@ -427,28 +427,18 @@ def crear_stacked_ingresos_categoria(df_filtrado):
             font=dict(family='Roboto Condensed', size=FONT_LABEL, color=TICK_COLOR),
         )
 
-    # Leyenda manual como annotations: Sueldo → Negocio → Otro Ingreso
-    leyenda_items = list(zip(cats_ingreso, colores_cats))
-    x_pos = 0.0
-    for cat, color in leyenda_items:
-        # cuadrado de color
-        fig.add_annotation(
-            text=f"<span style='color:{color}'>■</span> {cat}",
-            xref="paper", yref="paper",
-            x=x_pos, y=1.08,
-            showarrow=False, xanchor="left", yanchor="bottom",
-            font=dict(family='Roboto Condensed', size=9, color=TICK_COLOR),
-        )
-        x_pos += 0.22
-
     fig.update_layout(
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=90, t=36, b=20),
+        height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
+        # ✅ Eje X completamente oculto, sin grilla
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        showlegend=False,
+        # ✅ Leyenda compacta en 1 línea
+        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
@@ -463,6 +453,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())
     ahorro_val  = max(float(presupuesto_disponible), 0)
 
+    # Orden explícito: Ingreso, Gasto, Ahorro
     segmentos = [
         ('Ingreso', ingreso_val, COLORS['cian']),
         ('Gasto',   gasto_val,   COLORS['rosa']),
@@ -472,8 +463,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     label_y = ['Resumen']
 
     fig = go.Figure()
-
-    for nombre, val, color in segmentos:
+    for rank, (nombre, val, color) in enumerate(segmentos):
         texto_inside = f'${val:,.0f}' if val > 0 else ''
         fig.add_trace(go.Bar(
             name=nombre, y=label_y, x=[val], orientation='h',
@@ -482,7 +472,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             textfont=dict(family='Roboto Condensed', size=FONT_LABEL, color='white'),
             hovertemplate=f'<b>{nombre}</b><br>$%{{x:,.0f}}<extra></extra>',
             width=0.55,
-            showlegend=False,
+            legendrank=rank + 1,
         ))
 
     x_fin = gasto_val + ahorro_val
@@ -500,26 +490,18 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             font=dict(family='Roboto Condensed', size=FONT_LABEL, color=lbl_color),
         )
 
-    # Leyenda manual como annotations: Ingreso → Gasto → Ahorro
-    x_pos = 0.0
-    for nombre, _, color in segmentos:
-        fig.add_annotation(
-            text=f"<span style='color:{color}'>■</span> {nombre}",
-            xref="paper", yref="paper",
-            x=x_pos, y=1.08,
-            showarrow=False, xanchor="left", yanchor="bottom",
-            font=dict(family='Roboto Condensed', size=9, color=TICK_COLOR),
-        )
-        x_pos += 0.18
-
     fig.update_layout(
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=120, t=36, b=20),
+        height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
+        # ✅ Eje X completamente oculto, sin grilla
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        showlegend=False,
+        # ✅ Leyenda compacta en 1 línea
+        legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
