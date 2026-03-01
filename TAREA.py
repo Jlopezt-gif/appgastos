@@ -385,6 +385,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
 
 # ============================================
 # GRÁFICO: Ingresos por Categoría (stacked horizontal)
+# ✅ MODIFICADO: leyenda más pequeña en 1 línea + margen inferior ampliado
 # ============================================
 def crear_stacked_ingresos_categoria(df_filtrado):
     tema   = st.get_option("theme.base")
@@ -431,13 +432,17 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
+        # ✅ margen inferior aumentado de 20 → 40
+        height=CHART_H, margin=dict(l=12, r=90, t=28, b=40),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
+                   # ✅ fuente del eje X reducida a 10
+                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
+        # ✅ leyenda más compacta: size 9, itemwidth reducido, sin gap entre grupos
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
+                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
@@ -445,6 +450,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
 
 # ============================================
 # GRÁFICO: Detalle de las Finanzas — Ingreso / Gasto / Ahorro (stacked horizontal)
+# ✅ MODIFICADO: leyenda más pequeña en 1 línea + margen inferior ampliado
 # ============================================
 def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     tema   = st.get_option("theme.base")
@@ -493,13 +499,17 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
+        # ✅ margen inferior aumentado de 20 → 40
+        height=CHART_H, margin=dict(l=12, r=120, t=28, b=40),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
-                   tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
+                   # ✅ fuente del eje X reducida a 10
+                   tickfont={'family':'Roboto Condensed','size':10,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
+        # ✅ leyenda más compacta: size 9, itemwidth reducido, sin gap entre grupos
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':11,'color':TICK_COLOR}, bgcolor="rgba(0,0,0,0)"),
+                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
     )
