@@ -324,7 +324,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
             ],
             'threshold': {'line': {'color': TICK_COLOR, 'width': 2}, 'thickness': 0.65, 'value': presupuesto_mes}
         },
-        number={'font': {'family': 'Roboto Condensed', 'size': 24, 'color': TICK_COLOR}, 'prefix': "$"}
+        number={'font': {'family': 'Roboto Condensed', 'size': 24, 'color': TICK_COLOR}, 'prefix': "$", 'valueformat': ',.0f'}
     ))
     fig.add_annotation(
         text=f"Objetivo: ${presupuesto_mes:,.0f}", xref="paper", yref="paper",
