@@ -437,7 +437,7 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
@@ -500,7 +500,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
-                    font={'family':'Roboto Condensed','size':9,'color':TICK_COLOR},
+                    font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
