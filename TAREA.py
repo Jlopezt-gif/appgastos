@@ -72,7 +72,7 @@ st.markdown("""
     
     .stMetric label {
         font-family: 'Roboto Condensed', sans-serif !important;
-        font-size: 14px !important;
+        font-size: 18px !important;
         font-weight: 400 !important;
         color: #0081FF !important;
     }
@@ -871,7 +871,7 @@ with col5:
     
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
                 ${presupuesto_disponible:,.2f}
             </div>
@@ -885,7 +885,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 def chart_title(texto):
     st.markdown(
-        f"<h4 style='font-weight:500; margin:0 0 4px 0; font-size:15px;'>{texto}</h4>",
+        f"<h4 style='font-weight:500; margin:0 0 4px 0; font-size:18px;'>{texto}</h4>",
         unsafe_allow_html=True
     )
 
