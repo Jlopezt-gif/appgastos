@@ -499,7 +499,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=105, r=15, t=4, b=18),
+        margin=dict(l=105, r=15, t=4, b=40),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False,
