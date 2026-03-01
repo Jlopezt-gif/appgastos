@@ -571,10 +571,7 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
         margin=dict(l=52, r=12, t=10, b=36),
         xaxis=dict(
             showgrid=False,
-            tickmode='array',
-            tickvals=todos_dias,
-            ticktext=[str(d) for d in todos_dias],
-            tickfont={'family': 'Roboto Condensed', 'size': 9, 'color': TICK_COLOR},
+            showticklabels=False,
             fixedrange=True,
             zeroline=False,
             range=[0.5, dias_en_mes + 0.5],
