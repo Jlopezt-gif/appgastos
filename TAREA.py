@@ -844,22 +844,34 @@ with col1:
     """, unsafe_allow_html=True)
 
 with col2:
-    st.metric(
-        label="Ingreso",
-        value=f"${ingresos_total:,.2f}"
-    )
+    st.markdown(f"""
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 400; color: #0081FF;">Ingreso</label>
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #333333; margin-top: 8px;">
+                ${ingresos_total:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col3:
-    st.metric(
-        label="Gasto",
-        value=f"${gastos_total:,.2f}"
-    )
+    st.markdown(f"""
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 400; color: #0081FF;">Gasto</label>
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #333333; margin-top: 8px;">
+                ${gastos_total:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col4:
-    st.metric(
-        label="Presupuesto",
-        value=f"${presupuesto_mes:,.2f}"
-    )
+    st.markdown(f"""
+        <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 400; color: #0081FF;">Presupuesto</label>
+            <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: #333333; margin-top: 8px;">
+                ${presupuesto_mes:,.2f}
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 with col5:
     if presupuesto_disponible <= 0:
