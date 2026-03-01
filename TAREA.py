@@ -179,11 +179,11 @@ st.markdown("""
     div[data-testid="stPlotlyChart"] {
         background-color: #FFFFFF;
         border-radius: 12px;
-        border: none;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
         padding: 12px 12px 8px 12px;
         margin-bottom: 4px;
-        overflow: visible;
+        overflow: hidden;
     }
     /* Forzar que el SVG interno no desborde */
     div[data-testid="stPlotlyChart"] svg {
