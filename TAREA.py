@@ -72,7 +72,7 @@ st.markdown("""
     
     .stMetric label {
         font-family: 'Roboto Condensed', sans-serif !important;
-        font-size: 14px !important;
+        font-size: 18px !important;
         font-weight: 400 !important;
         color: #0081FF !important;
     }
@@ -187,7 +187,7 @@ st.markdown("""
     }
     /* Forzar que el SVG interno no desborde */
     div[data-testid="stPlotlyChart"] svg {
-        max-height: 248px !important;
+        max-height: 330px !important;
     }
     /* Eliminar el fondo blanco interno que Plotly agrega al iframe/svg */
     div[data-testid="stPlotlyChart"] > div {
@@ -386,7 +386,7 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 TICK_COLOR = "#999999"
 GRID_COLOR_LIGHT = "#E8E8E8"
 GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
-CHART_H = 300            # altura aumentada para que no se corten las etiquetas de meses
+CHART_H = 320            # altura aumentada para que no se corten las etiquetas de meses
 
 # ── Tamaños de fuente unificados ──────────────────────────────────────────────
 FONT_AXIS  = 12   # ticks de ejes X e Y
@@ -499,7 +499,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=105, r=15, t=4, b=18),
+        margin=dict(l=105, r=15, t=4, b=40),
         xaxis=dict(showgrid=True, gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False,
@@ -549,7 +549,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=52, r=8, t=28, b=68),
+        margin=dict(l=52, r=8, t=28, b=90),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
@@ -604,7 +604,7 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family':'Roboto Condensed','color':TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=52, r=8, t=28, b=68),
+        margin=dict(l=52, r=8, t=28, b=90),
         xaxis=dict(gridcolor=grid_c,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=True),
@@ -871,7 +871,7 @@ with col5:
     
     st.markdown(f"""
         <div class="stMetric" style="background-color: #FFFFFF; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); height: 120px; display: flex; flex-direction: column; justify-content: center;">
-            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 14px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
+            <label style="font-family: 'Roboto Condensed', sans-serif; font-size: 18px; font-weight: 400; color: #0081FF;">Presupuesto Disponible</label>
             <div style="font-family: 'Roboto Condensed', sans-serif; font-size: 32px; font-weight: 400; color: {color_valor}; margin-top: 8px;">
                 ${presupuesto_disponible:,.2f}
             </div>
@@ -885,7 +885,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 def chart_title(texto):
     st.markdown(
-        f"<h4 style='font-weight:500; margin:0 0 4px 0; font-size:15px;'>{texto}</h4>",
+        f"<h4 style='font-weight:500; margin:0 0 4px 0; font-size:18px;'>{texto}</h4>",
         unsafe_allow_html=True
     )
 
