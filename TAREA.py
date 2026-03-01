@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 from datetime import datetime
+import calendar
 import requests
 from io import BytesIO
 from PIL import Image
@@ -385,12 +386,10 @@ def crear_barras_horizontales_categorias(df_filtrado):
 
 # ============================================
 # GRÁFICO: Ingresos por Categoría (stacked horizontal)
-# ✅ Orden leyenda: Sueldo → Negocio → Otro Ingreso | Sin eje X | Sin grilla
 # ============================================
 def crear_stacked_ingresos_categoria(df_filtrado):
     ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
 
-    # Orden explícito: Sueldo, Negocio, Otro Ingreso
     cats_ingreso = ['Sueldo', 'Negocio', 'Otro Ingreso']
     colores_cats = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
 
@@ -432,10 +431,8 @@ def crear_stacked_ingresos_categoria(df_filtrado):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H, margin=dict(l=12, r=90, t=28, b=20),
-        # ✅ Eje X completamente oculto, sin grilla
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
@@ -445,15 +442,13 @@ def crear_stacked_ingresos_categoria(df_filtrado):
     return fig
 
 # ============================================
-# GRÁFICO: Detalle de las Finanzas — Ingreso / Gasto / Ahorro (stacked horizontal)
-# ✅ Orden leyenda: Ingreso → Gasto → Ahorro | Sin eje X | Sin grilla
+# GRÁFICO: Detalle de las Finanzas
 # ============================================
 def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
     ingreso_val = float(df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum())
     gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())
     ahorro_val  = max(float(presupuesto_disponible), 0)
 
-    # Orden explícito: Ingreso, Gasto, Ahorro
     segmentos = [
         ('Ingreso', ingreso_val, COLORS['cian']),
         ('Gasto',   gasto_val,   COLORS['rosa']),
@@ -495,15 +490,266 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
-        # ✅ Eje X completamente oculto, sin grilla
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
-        # ✅ Leyenda compacta en 1 línea
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
                     font={'family':'Roboto Condensed','size':12,'color':TICK_COLOR},
                     bgcolor="rgba(0,0,0,0)", itemwidth=30, tracegroupgap=0),
         hovermode='y unified', dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']}
+    )
+    return fig
+
+# ============================================
+# GRÁFICO: Gastos por Día (NUEVO)
+# Línea sin puntos, todos los días del mes en eje X,
+# colores de escala según monto, hover interactivo
+# ============================================
+def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
+    tema   = st.get_option("theme.base")
+    grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+
+    # Todos los días del mes seleccionado
+    dias_en_mes = calendar.monthrange(año_filtro, mes_filtro)[1]
+    todos_dias  = list(range(1, dias_en_mes + 1))
+
+    gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
+
+    # Suma por día, rellenando con 0 los días sin gasto
+    if len(gastos) > 0:
+        por_dia = gastos.groupby('Dia')['Monto'].sum()
+        valores = [float(por_dia.get(d, 0)) for d in todos_dias]
+    else:
+        valores = [0.0] * dias_en_mes
+
+    # Escala de color: verde → amarillo → naranja → rosa según intensidad
+    max_val = max(valores) if max(valores) > 0 else 1
+
+    def color_por_intensidad(val, max_v):
+        ratio = val / max_v if max_v > 0 else 0
+        if ratio == 0:
+            return TICK_COLOR
+        elif ratio <= 0.33:
+            return COLORS['cian']
+        elif ratio <= 0.66:
+            return COLORS['naranja']
+        else:
+            return COLORS['rosa']
+
+    colores_puntos = [color_por_intensidad(v, max_val) for v in valores]
+
+    # Texto para hover
+    hover_texts = []
+    for d, v in zip(todos_dias, valores):
+        if v > 0:
+            # Detalle de categorías para ese día
+            detalle = gastos[gastos['Dia'] == d].groupby('Categoría')['Monto'].sum()
+            lineas  = [f"&nbsp;&nbsp;{cat}: ${monto:,.0f}" for cat, monto in detalle.items()]
+            detalle_str = "<br>".join(lineas)
+            hover_texts.append(f"<b>Día {d}</b><br>Total: ${v:,.0f}<br>{detalle_str}")
+        else:
+            hover_texts.append(f"<b>Día {d}</b><br>Sin gastos")
+
+    fig = go.Figure()
+
+    # Área suave bajo la línea para dar profundidad visual
+    fig.add_trace(go.Scatter(
+        x=todos_dias, y=valores,
+        mode='lines',
+        fill='tozeroy',
+        fillcolor='rgba(0,129,255,0.06)',
+        line=dict(color='rgba(0,0,0,0)', width=0),
+        showlegend=False,
+        hoverinfo='skip',
+    ))
+
+    # Línea principal sin marcadores
+    fig.add_trace(go.Scatter(
+        x=todos_dias,
+        y=valores,
+        mode='lines',
+        name='Gasto diario',
+        line=dict(color=COLORS['azul'], width=2, shape='spline', smoothing=0.6),
+        marker=dict(size=0),
+        text=hover_texts,
+        hovertemplate='%{text}<extra></extra>',
+        showlegend=False,
+    ))
+
+    # Puntos visibles solo en días con gasto (sin círculo, solo un punto fino)
+    dias_con_gasto  = [d for d, v in zip(todos_dias, valores) if v > 0]
+    vals_con_gasto  = [v for v in valores if v > 0]
+    colores_validos = [color_por_intensidad(v, max_val) for v in vals_con_gasto]
+
+    if dias_con_gasto:
+        fig.add_trace(go.Scatter(
+            x=dias_con_gasto,
+            y=vals_con_gasto,
+            mode='markers',
+            marker=dict(
+                size=6,
+                color=colores_validos,
+                line=dict(width=0),
+                symbol='circle',
+            ),
+            text=[hover_texts[d-1] for d in dias_con_gasto],
+            hovertemplate='%{text}<extra></extra>',
+            showlegend=False,
+        ))
+
+    y_max = max_val * 1.35 if max_val > 0 else 100
+
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
+        height=CHART_H,
+        margin=dict(l=52, r=12, t=10, b=40),
+        xaxis=dict(
+            showgrid=False,
+            tickmode='array',
+            tickvals=todos_dias,
+            ticktext=[str(d) for d in todos_dias],
+            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            fixedrange=True,
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor=grid_c,
+            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            fixedrange=True,
+            range=[0, y_max],
+            zeroline=False,
+        ),
+        hovermode='x unified',
+        hoverlabel=dict(
+            bgcolor="white" if tema != "dark" else "#1F2937",
+            font_size=11,
+            font_family='Roboto Condensed',
+        ),
+        dragmode=False,
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
+    )
+    return fig
+
+# ============================================
+# GRÁFICO: Ahorro por Mes — línea anual con scroll (NUEVO)
+# Misma estructura que crear_lineas_presupuesto_gasto_anual
+# Línea de 0 visible, colores: verde=ahorro / rosa=déficit
+# ============================================
+def crear_lineas_ahorro_mensual(df, año_filtro):
+    tema     = st.get_option("theme.base")
+    grid_c   = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
+    bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
+
+    meses_n = list(range(1, 13))
+    meses_l = [MESES[m] for m in meses_n]
+
+    ahorros = []
+    for m in meses_n:
+        pres = obtener_ultimo_presupuesto_mes(df, año_filtro, m)
+        gasto = df[
+            (df['Tipo'] == 'Gasto') &
+            (df['Año'] == año_filtro) &
+            (df['Mes'] == m)
+        ]['Monto'].sum()
+        # Solo calculamos ahorro si hubo presupuesto ese mes
+        if pres > 0:
+            ahorros.append(float(pres - gasto))
+        else:
+            ahorros.append(None)
+
+    # Separar positivos y negativos para colorear distinto
+    ahorros_pos  = [v if (v is not None and v >= 0) else None for v in ahorros]
+    ahorros_neg  = [v if (v is not None and v < 0)  else None for v in ahorros]
+
+    # Rango Y
+    vals_validos = [v for v in ahorros if v is not None]
+    if vals_validos:
+        min_v = min(vals_validos)
+        max_v = max(vals_validos)
+        padding = max(abs(max_v), abs(min_v)) * 0.35
+        y_min = min(min_v - padding, -padding * 0.3)
+        y_max = max_v + padding
+    else:
+        y_min, y_max = -100, 100
+
+    fig = go.Figure()
+
+    # Línea de 0
+    fig.add_hline(
+        y=0,
+        line=dict(color=TICK_COLOR, width=1, dash='dot'),
+        annotation_text="0",
+        annotation_font=dict(family='Roboto Condensed', size=10, color=TICK_COLOR),
+        annotation_position="left",
+    )
+
+    # Línea ahorro positivo (verde/cian)
+    fig.add_trace(go.Scatter(
+        x=meses_l, y=ahorros_pos,
+        mode='lines+markers',
+        name='Ahorro',
+        line=dict(color=COLORS['azul'], width=1),
+        marker=dict(size=4, color=COLORS['azul']),
+        connectgaps=False,
+        hovertemplate='<b>%{x}</b><br>Ahorro: $%{y:,.0f}<extra></extra>',
+        cliponaxis=False,
+    ))
+
+    # Línea déficit (rosa)
+    fig.add_trace(go.Scatter(
+        x=meses_l, y=ahorros_neg,
+        mode='lines+markers',
+        name='Déficit',
+        line=dict(color=COLORS['rosa'], width=1),
+        marker=dict(size=4, color=COLORS['rosa']),
+        connectgaps=False,
+        hovertemplate='<b>%{x}</b><br>Déficit: $%{y:,.0f}<extra></extra>',
+        cliponaxis=False,
+    ))
+
+    # Etiquetas de valor (mismo estilo que crear_lineas_presupuesto_gasto_anual)
+    annotations = []
+    for mes, val in zip(meses_l, ahorros):
+        if val is None:
+            continue
+        color_lbl = COLORS['azul'] if val >= 0 else COLORS['rosa']
+        annotations.append(dict(
+            x=mes, y=val,
+            text=f'${val:,.0f}',
+            showarrow=False, yshift=14,
+            font=dict(family='Roboto Condensed', size=FONT_LABEL, color=color_lbl),
+            bgcolor=bg_label, borderpad=2,
+        ))
+
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
+        height=CHART_H, margin=dict(l=52, r=8, t=28, b=90),
+        xaxis=dict(
+            showgrid=False,
+            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            tickangle=-45,
+            fixedrange=False,
+        ),
+        yaxis=dict(
+            showgrid=True, gridcolor=grid_c,
+            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            fixedrange=True,
+            range=[y_min, y_max],
+            zeroline=False,
+        ),
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
+            font={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
+            bgcolor="rgba(0,0,0,0)",
+        ),
+        annotations=annotations,
+        hovermode='x unified',
+        hoverlabel=dict(bgcolor="white" if tema != "dark" else "#1F2937", font_size=11),
+        dragmode=False,
+        modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
     return fig
 
@@ -892,7 +1138,24 @@ with col2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# FILA 3: Líneas anuales (con scroll móvil)
+# FILA 3 (NUEVA): Gastos por Día | Ahorro por Mes
+# ============================================
+col1, col2 = st.columns(2)
+with col1:
+    chart_title(f"Gastos por Día — {MESES[mes_seleccionado]} {año_seleccionado}")
+    st.plotly_chart(
+        crear_gastos_por_dia(df_filtrado, año_seleccionado, mes_seleccionado),
+        use_container_width=True,
+        config={'displayModeBar': False, 'staticPlot': False},  # staticPlot=False para hover
+    )
+with col2:
+    chart_title(f"Ahorro por Mes — {año_seleccionado}")
+    render_lineas_chart_mobile(crear_lineas_ahorro_mensual(df, año_seleccionado), "lineas_ahorro")
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# ============================================
+# FILA 4: Líneas anuales (con scroll móvil)
 # ============================================
 col1, col2 = st.columns(2)
 with col1:
