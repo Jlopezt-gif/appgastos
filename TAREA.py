@@ -1044,7 +1044,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    chart_title(f"Presupuestos vs Gastos Mensuales — {año_seleccionado}")
+    chart_title(f"Análisis Gasto y Presupuesto — {año_seleccionado}")
     fig_lineas = crear_lineas_presupuesto_gasto_anual(df, año_seleccionado)
     render_lineas_chart_mobile(fig_lineas, "lineas_presupuesto")
 
@@ -1196,7 +1196,7 @@ def render_tabla_html(df, header_color, table_id):
 
 with col1:
     chart_title("Detalle Gastos")
-    components.html(render_tabla_html(df_gastos_tabla, "#00C851", "tbl_gastos"), height=280, scrolling=False)
+    components.html(render_tabla_html(df_gastos_tabla, "#FF2E95", "tbl_gastos"), height=280, scrolling=False)
 
 with col2:
     chart_title("Detalle Ingresos")
