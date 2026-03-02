@@ -567,8 +567,8 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=400,
-        margin=dict(l=52, r=32, t=10, b=36),
+        height=412,
+        margin=dict(l=62, r=32, t=14, b=14),
         xaxis=dict(
             showgrid=False,
             showticklabels=False,
@@ -579,17 +579,18 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
         yaxis=dict(
             showgrid=True,
             gridcolor=grid_c,
-            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
+            tickformat='$,.0f',
             fixedrange=True,
             range=[0, y_max],
             zeroline=False,
         ),
-        # closest = muestra solo el tooltip del punto más cercano al cursor
         hovermode='closest',
         hoverlabel=dict(
             bgcolor="white" if tema != "dark" else "#1F2937",
             bordercolor=COLORS['azul'],
-            font=dict(size=11, family='Roboto Condensed', color='#333333'),
+            font=dict(size=12, family='Roboto Condensed', color='#222222'),
+            namelength=0,
         ),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
@@ -700,7 +701,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=400,
+        height=412,
         margin=dict(l=60, r=8, t=52, b=90),
         xaxis=dict(
             showgrid=False,
@@ -895,6 +896,7 @@ def render_hover_chart(fig, chart_id, chart_height=440):
     fig_html = pio.to_html(fig, full_html=False, include_plotlyjs=False,
                            config={"displayModeBar": False, "staticPlot": False})
     html_content = f"""
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
       html, body {{ margin:0; padding:0; background:transparent; }}
       .chart-box-{chart_id} {{
@@ -905,7 +907,9 @@ def render_hover_chart(fig, chart_id, chart_height=440):
         padding: 12px 12px 8px 12px;
         margin-bottom: 4px;
         width: 100%;
+        height: {chart_height - 24}px;
         box-sizing: border-box;
+        overflow: hidden;
       }}
       @media (prefers-color-scheme: dark) {{
         .chart-box-{chart_id} {{
@@ -1155,10 +1159,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     chart_title(f"Gastos por Día — {MESES[mes_seleccionado]} {año_seleccionado}")
-    render_hover_chart(crear_gastos_por_dia(df_filtrado, año_seleccionado, mes_seleccionado), "gastos_dia", chart_height=440)
+    render_hover_chart(crear_gastos_por_dia(df_filtrado, año_seleccionado, mes_seleccionado), "gastos_dia", chart_height=460)
 with col2:
     chart_title(f"Ahorro por Mes — {año_seleccionado}")
-    render_lineas_chart_mobile(crear_lineas_ahorro_mensual(df, año_seleccionado), "lineas_ahorro", chart_height=440)
+    render_lineas_chart_mobile(crear_lineas_ahorro_mensual(df, año_seleccionado), "lineas_ahorro", chart_height=460)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
