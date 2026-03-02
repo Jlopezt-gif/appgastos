@@ -567,7 +567,7 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H + 80,
+        height=400,
         margin=dict(l=52, r=32, t=10, b=36),
         xaxis=dict(
             showgrid=False,
@@ -700,7 +700,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H,
+        height=400,
         margin=dict(l=60, r=8, t=52, b=90),
         xaxis=dict(
             showgrid=False,
@@ -848,7 +848,9 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
 # ============================================
 # HELPER: scroll horizontal en móvil para líneas
 # ============================================
-def render_lineas_chart_mobile(fig, chart_id):
+def render_lineas_chart_mobile(fig, chart_id, chart_height=None):
+    if chart_height is None:
+        chart_height = CHART_H + 40
     fig_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn',
                            config={'displayModeBar': False, 'staticPlot': True})
     html_content = f"""
@@ -887,6 +889,42 @@ def render_lineas_chart_mobile(fig, chart_id):
     """
     components.html(html_content, height=CHART_H + 40, scrolling=False)
 
+
+
+# ============================================
+# HELPER: wrapper con hover habilitado (para gráfico de línea diaria)
+# Mismo estilo visual que render_lineas_chart_mobile pero staticPlot=False
+# ============================================
+def render_hover_chart(fig, chart_id, chart_height=440):
+    fig_html = pio.to_html(fig, full_html=False, include_plotlyjs=False,
+                           config={"displayModeBar": False, "staticPlot": False})
+    html_content = f"""
+    <style>
+      html, body {{ margin:0; padding:0; background:transparent; }}
+      .chart-box-{chart_id} {{
+        background-color: #FFFFFF;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+        padding: 12px 12px 8px 12px;
+        margin-bottom: 4px;
+        width: 100%;
+        box-sizing: border-box;
+      }}
+      @media (prefers-color-scheme: dark) {{
+        .chart-box-{chart_id} {{
+          background-color: #1e2530;
+          border: 1px solid #4A5568;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
+        }}
+      }}
+    </style>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <div class="chart-box-{chart_id}">
+      {fig_html}
+    </div>
+    """
+    components.html(html_content, height=chart_height, scrolling=False)
 
 # ============================================
 # APLICACIÓN PRINCIPAL
@@ -1121,14 +1159,10 @@ st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 with col1:
     chart_title(f"Gastos por Día — {MESES[mes_seleccionado]} {año_seleccionado}")
-    st.plotly_chart(
-        crear_gastos_por_dia(df_filtrado, año_seleccionado, mes_seleccionado),
-        use_container_width=True,
-        config={'displayModeBar': False, 'staticPlot': False},  # staticPlot=False para hover
-    )
+    render_hover_chart(crear_gastos_por_dia(df_filtrado, año_seleccionado, mes_seleccionado), "gastos_dia", chart_height=440)
 with col2:
     chart_title(f"Ahorro por Mes — {año_seleccionado}")
-    render_lineas_chart_mobile(crear_lineas_ahorro_mensual(df, año_seleccionado), "lineas_ahorro")
+    render_lineas_chart_mobile(crear_lineas_ahorro_mensual(df, año_seleccionado), "lineas_ahorro", chart_height=440)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
