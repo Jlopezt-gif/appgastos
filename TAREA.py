@@ -623,7 +623,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
     bar_colors = []
     for v in ahorros:
         if v is None:
-            bar_colors.append('rgba(180,180,180,0.25)')
+            bar_colors.append('rgba(180,180,180,0.20)')
         elif v >= 0:
             bar_colors.append(COLORS['azul'])
         else:
@@ -632,16 +632,16 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
     # Valores para la barra (None → 0 visual pero sin etiqueta)
     bar_vals = [v if v is not None else 0 for v in ahorros]
 
-    # Rango Y con margen generoso para etiquetas arriba y abajo
+    # Rango Y: siempre incluye 0 visible con margen para etiquetas
     vals_validos = [v for v in ahorros if v is not None]
     if vals_validos:
         min_v   = min(vals_validos)
         max_v   = max(vals_validos)
         abs_max = max(abs(min_v), abs(max_v), 1)
-        pad_top = abs_max * 0.55
-        pad_bot = abs_max * 0.55
-        y_min   = min(min_v - pad_bot, -abs_max * 0.12)
-        y_max   = max_v + pad_top
+        pad     = abs_max * 0.55
+        # Garantizar que el 0 siempre quede visible en el centro aprox
+        y_min   = min(min_v - pad, -abs_max * 0.20)
+        y_max   = max(max_v + pad,  abs_max * 0.20)
     else:
         y_min, y_max = -500, 500
 
@@ -666,7 +666,6 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
         if val is None:
             continue
         color_lbl = COLORS['azul'] if val >= 0 else COLORS['rosa']
-        # Etiqueta arriba si positivo, debajo si negativo
         yshift    = 18 if val >= 0 else -18
         yanchor   = 'bottom' if val >= 0 else 'top'
         annotations.append(dict(
@@ -676,13 +675,12 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             yshift=yshift,
             xanchor='center',
             yanchor=yanchor,
-            font=dict(family='Roboto Condensed', size=13, color=color_lbl, weight='bold' if False else None),
+            font=dict(family='Roboto Condensed', size=13, color=color_lbl),
             bgcolor=bg_label,
             borderpad=3,
         ))
 
-    # Leyenda manual como shapes/anotaciones (no traces)
-    # Se usan anotaciones de texto coloreado en la esquina superior izquierda
+    # Leyenda como anotaciones de texto
     legend_annotations = [
         dict(
             x=0, y=1.08, xref='paper', yref='paper',
@@ -691,7 +689,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
         ),
         dict(
-            x=0.18, y=1.08, xref='paper', yref='paper',
+            x=0.20, y=1.08, xref='paper', yref='paper',
             text=f'<span style="color:{COLORS["rosa"]}">●</span> Déficit',
             showarrow=False, xanchor='left',
             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
@@ -715,8 +713,8 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             fixedrange=True,
             range=[y_min, y_max],
             zeroline=True,
-            zerolinecolor=TICK_COLOR,
-            zerolinewidth=1,
+            zerolinecolor='rgba(150,150,150,0.8)',
+            zerolinewidth=2,
         ),
         showlegend=False,
         annotations=annotations + legend_annotations,
