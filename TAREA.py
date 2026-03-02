@@ -617,7 +617,8 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             (df['Año'] == año_filtro) &
             (df['Mes'] == m)
         ]['Monto'].sum()
-        ahorros.append(float(pres - gasto) if pres > 0 else None)
+        tiene_actividad = (pres > 0) or (gasto > 0)
+        ahorros.append(float(pres - gasto) if tiene_actividad else None)
 
     # Color por barra: azul=ahorro, rosa=déficit, gris=sin datos
     bar_colors = []
