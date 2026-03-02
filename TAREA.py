@@ -470,19 +470,13 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             legendrank=rank + 1,
         ))
 
-    x_fin = gasto_val + ahorro_val
-    if presupuesto_disponible < 0:
-        lbl_txt   = f'  ⚠ Déficit: ${abs(presupuesto_disponible):,.0f}'
-        lbl_color = COLORS['rosa']
-    else:
-        lbl_txt   = f'  Ahorro: ${ahorro_val:,.0f}'
-        lbl_color = COLORS['azul']
-
-    if x_fin > 0:
+    # Solo mostrar anotación de ahorro si hay ahorro positivo (sin etiqueta de déficit)
+    if ahorro_val > 0:
+        x_fin = gasto_val + ahorro_val
         fig.add_annotation(
-            x=x_fin, y=0, text=lbl_txt,
+            x=x_fin, y=0, text=f'  Ahorro: ${ahorro_val:,.0f}',
             showarrow=False, xanchor='left',
-            font=dict(family='Roboto Condensed', size=FONT_LABEL, color=lbl_color),
+            font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['azul']),
         )
 
     fig.update_layout(
