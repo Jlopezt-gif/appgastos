@@ -374,7 +374,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=105, r=15, t=4, b=40),
+        height=CHART_H, margin=dict(l=50, r=15, t=4, b=40),
         xaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False, range=[0, mx * 1.40]),
