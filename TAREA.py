@@ -567,7 +567,7 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H,
+        height=CHART_H + 80,
         margin=dict(l=52, r=32, t=10, b=36),
         xaxis=dict(
             showgrid=False,
@@ -684,13 +684,13 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
     # Leyenda como anotaciones de texto
     legend_annotations = [
         dict(
-            x=0, y=1.08, xref='paper', yref='paper',
+            x=0, y=1.16, xref='paper', yref='paper',
             text=f'<span style="color:{COLORS["azul"]}">●</span> Ahorro',
             showarrow=False, xanchor='left',
             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
         ),
         dict(
-            x=0.20, y=1.08, xref='paper', yref='paper',
+            x=0.20, y=1.16, xref='paper', yref='paper',
             text=f'<span style="color:{COLORS["rosa"]}">●</span> Déficit',
             showarrow=False, xanchor='left',
             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
@@ -701,7 +701,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H,
-        margin=dict(l=60, r=8, t=36, b=90),
+        margin=dict(l=60, r=8, t=52, b=90),
         xaxis=dict(
             showgrid=False,
             tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
