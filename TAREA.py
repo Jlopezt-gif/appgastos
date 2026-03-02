@@ -555,7 +555,7 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=412,
-        margin=dict(l=62, r=32, t=14, b=14),
+        margin=dict(l=62, r=32, t=14, b=40),
         xaxis=dict(
             showgrid=False,
             showticklabels=False,
@@ -568,9 +568,12 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
             gridcolor=grid_c, gridwidth=0.3,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
             tickformat='$,.0f',
+            tickprefix='$',
             fixedrange=True,
             range=[0, y_max],
             zeroline=False,
+            rangemode='tozero',
+            nticks=5,
         ),
         hovermode='closest',
         hoverlabel=dict(
