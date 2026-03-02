@@ -277,8 +277,8 @@ def obtener_ultimo_presupuesto_mes(df, año, mes):
 # CONSTANTES DE ESTILO PARA GRÁFICOS
 # ============================================
 TICK_COLOR       = "#999999"
-GRID_COLOR_LIGHT = "#E8E8E8"
-GRID_COLOR_DARK  = "rgba(255,255,255,0.12)"
+GRID_COLOR_LIGHT = "rgba(200,200,200,0.4)"
+GRID_COLOR_DARK  = "rgba(255,255,255,0.06)"
 CHART_H          = 320
 FONT_AXIS        = 12
 FONT_LABEL       = 12
@@ -375,7 +375,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
         height=CHART_H, margin=dict(l=105, r=15, t=4, b=40),
-        xaxis=dict(showgrid=True, gridcolor=grid_c,
+        xaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, zeroline=False, range=[0, mx * 1.40]),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
@@ -565,7 +565,7 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
         ),
         yaxis=dict(
             showgrid=True,
-            gridcolor=grid_c,
+            gridcolor=grid_c, gridwidth=0.3,
             tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
             tickformat='$,.0f',
             fixedrange=True,
@@ -697,7 +697,7 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             fixedrange=False,
         ),
         yaxis=dict(
-            showgrid=True, gridcolor=grid_c,
+            showgrid=True, gridcolor=grid_c, gridwidth=0.3,
             tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
             fixedrange=True,
             range=[y_min, y_max],
@@ -764,7 +764,7 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
         xaxis=dict(showgrid=False,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=False),
-        yaxis=dict(showgrid=True, gridcolor=grid_c,
+        yaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
@@ -821,7 +821,7 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
         xaxis=dict(showgrid=False,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    tickangle=-45, fixedrange=False),
-        yaxis=dict(showgrid=True, gridcolor=grid_c,
+        yaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
                    tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR},
                    fixedrange=True, range=[0, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
