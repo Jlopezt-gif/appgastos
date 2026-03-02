@@ -874,12 +874,8 @@ def render_lineas_chart_mobile(fig, chart_id, chart_height=None):
           box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 1px 4px rgba(0,0,0,0.2);
         }}
       }}
-      .chart-scroll-{chart_id} {{ width:100%; box-sizing:border-box; }}
-      .chart-inner-{chart_id}  {{ width:100%; }}
-      @media (max-width: 768px) {{
-        .chart-scroll-{chart_id} {{ overflow-x:auto; -webkit-overflow-scrolling:touch; }}
-        .chart-inner-{chart_id}  {{ min-width:900px; width:900px; }}
-      }}
+      .chart-scroll-{chart_id} {{ width:100%; box-sizing:border-box; overflow-x:auto; -webkit-overflow-scrolling:touch; }}
+      .chart-inner-{chart_id}  {{ min-width:900px; width:900px; }}
     </style>
     <div class="chart-box-{chart_id}">
       <div class="chart-scroll-{chart_id}">
@@ -887,7 +883,7 @@ def render_lineas_chart_mobile(fig, chart_id, chart_height=None):
       </div>
     </div>
     """
-    components.html(html_content, height=CHART_H + 40, scrolling=False)
+    components.html(html_content, height=chart_height, scrolling=False)
 
 
 
