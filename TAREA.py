@@ -470,20 +470,13 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             legendrank=rank + 1,
         ))
 
-    # Solo mostrar anotación de ahorro si hay ahorro positivo (sin etiqueta de déficit)
-    if ahorro_val > 0:
-        x_fin = gasto_val + ahorro_val
-        fig.add_annotation(
-            x=x_fin, y=0, text=f'  Ahorro: ${ahorro_val:,.0f}',
-            showarrow=False, xanchor='left',
-            font=dict(family='Roboto Condensed', size=FONT_LABEL, color=COLORS['azul']),
-        )
+    # ← Sin ninguna anotación lateral, los valores ya están dentro de cada barra
 
     fig.update_layout(
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=120, t=28, b=20),
+        height=CHART_H, margin=dict(l=12, r=20, t=28, b=20),  # ← r reducido a 20 ya que no hay etiqueta lateral
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
