@@ -352,8 +352,8 @@ def crear_barras_horizontales_categorias(df_filtrado):
         fig = go.Figure()
         fig.add_annotation(text="Sin datos", xref="paper", yref="paper",
                            x=0.5, y=0.5, showarrow=False, font={'size': 13, 'color': TICK_COLOR})
-        fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                          height=CHART_H, margin=dict(l=10,r=10,t=5,b=5))
+         fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                          height=CHART_H, margin=dict(l=105, r=15, t=4, b=40))
         return fig
 
     por_cat = gastos.groupby('Categoría')['Monto'].sum().sort_values(ascending=True)
