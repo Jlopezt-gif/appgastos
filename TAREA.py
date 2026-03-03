@@ -919,7 +919,7 @@ def render_hover_chart(fig, chart_id, chart_height=440):
 # ============================================
 # APLICACIÓN PRINCIPAL
 # ============================================
-BD_CLIENTS_URL = "https://docs.google.com/spreadsheets/d/1-m5M_SYYlD--xzRmPx6_7BnKmftPTbgzswKq1Tp1TH8/export?format=csv"
+BD_CLIENTS_URL = "https://docs.google.com/spreadsheets/d/1rbMC__-FaiAmYz8CXrlGDa5rcVEt-Sm-4pIQYG7n3Uc/edit?usp=sharing"
 
 params     = st.query_params
 cliente_id = params.get("cliente")
