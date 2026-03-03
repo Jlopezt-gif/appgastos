@@ -1286,7 +1286,7 @@ st.markdown(f"""
         </p>
         <div style='display:flex; justify-content:center; gap:20px; align-items:center;'>
             <!-- Facebook -->
-            <a href="https://www.facebook.com/tupagina" target="_blank"
+            <a href="https://www.facebook.com/profile.php?id=61581321913878" target="_blank"
                style='display:inline-flex; align-items:center; justify-content:center;
                       width:44px; height:44px; border-radius:50%;
                       background-color:#1877F2; text-decoration:none;
@@ -1297,7 +1297,7 @@ st.markdown(f"""
                 </svg>
             </a>
             <!-- Instagram -->
-            <a href="https://www.instagram.com/tupagina" target="_blank"
+            <a href="https://www.instagram.com/elboti_bot/" target="_blank"
                style='display:inline-flex; align-items:center; justify-content:center;
                       width:44px; height:44px; border-radius:50%;
                       background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);
@@ -1312,7 +1312,7 @@ st.markdown(f"""
                 </svg>
             </a>
             <!-- TikTok -->
-            <a href="https://www.tiktok.com/@tupagina" target="_blank"
+            <a href="https://www.tiktok.com/@elboti_bot" target="_blank"
                style='display:inline-flex; align-items:center; justify-content:center;
                       width:44px; height:44px; border-radius:50%;
                       background-color:#010101; text-decoration:none;
@@ -1326,7 +1326,7 @@ st.markdown(f"""
                 </svg>
             </a>
             <!-- WhatsApp -->
-            <a href="https://wa.me/56912345678" target="_blank"
+            <a href="https://wa.me/51920743474" target="_blank"
                style='display:inline-flex; align-items:center; justify-content:center;
                       width:44px; height:44px; border-radius:50%;
                       background-color:#25D366; text-decoration:none;
