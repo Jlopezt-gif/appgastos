@@ -227,7 +227,7 @@ def load_client_data(url):
     df = pd.read_csv(url)
     df.columns = df.columns.str.strip()
     if 'Fecha' in df.columns:
-        df['Fecha'] = pd.to_datetime(df['Fecha'])
+        df['Fecha'] = pd.to_datetime(df['Fecha'], errors='coerce')
     if 'Monto' in df.columns:
         df['Monto'] = pd.to_numeric(df['Monto'], errors='coerce').fillna(0)
     if 'Año' in df.columns:
@@ -236,6 +236,8 @@ def load_client_data(url):
         df['Mes'] = pd.to_numeric(df['Mes'], errors='coerce').fillna(datetime.now().month).astype(int)
     if 'Dia' in df.columns:
         df['Dia'] = pd.to_numeric(df['Dia'], errors='coerce').fillna(1).astype(int)
+    # Eliminar filas completamente vacías
+    df = df.dropna(how='all')
     return df
 
 def load_logo(url):
@@ -252,6 +254,8 @@ def load_logo(url):
 # CÁLCULOS
 # ============================================
 def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
+    if len(df) == 0:
+        return 0, 0, 0
     presupuestos_mes = df[
         (df['Tipo'] == 'Presupuesto') &
         (df['Año'] == año_filtro) &
@@ -266,6 +270,8 @@ def calcular_presupuesto_disponible(df, año_filtro, mes_filtro):
     return ultimo_presupuesto - gastos_mes, ultimo_presupuesto, gastos_mes
 
 def obtener_ultimo_presupuesto_mes(df, año, mes):
+    if len(df) == 0:
+        return 0
     presupuestos = df[
         (df['Tipo'] == 'Presupuesto') &
         (df['Año'] == año) &
@@ -289,7 +295,7 @@ FONT_GAUGE_TICK  = 12
 # ============================================
 def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
     tema = st.get_option("theme.base")
-    gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
+    gasto_total = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum() if len(df_filtrado) > 0 else 0
     max_value   = presupuesto_mes if presupuesto_mes > 0 else (gasto_total if gasto_total > 0 else 100)
     porcentaje  = (gasto_total / presupuesto_mes * 100) if presupuesto_mes > 0 else 0
 
@@ -346,7 +352,7 @@ def crear_gauge_presupuesto(df_filtrado, presupuesto_mes):
 def crear_barras_horizontales_categorias(df_filtrado):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
-    gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
+    gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy() if len(df_filtrado) > 0 else pd.DataFrame()
 
     if len(gastos) == 0:
         fig = go.Figure()
@@ -388,7 +394,7 @@ def crear_barras_horizontales_categorias(df_filtrado):
 # GRÁFICO: Ingresos por Categoría (stacked horizontal)
 # ============================================
 def crear_stacked_ingresos_categoria(df_filtrado):
-    ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
+    ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy() if len(df_filtrado) > 0 else pd.DataFrame()
 
     cats_ingreso = ['Sueldo', 'Negocio', 'Otro Ingreso']
     colores_cats = [COLORS['azul'], COLORS['cian'], COLORS['naranja']]
@@ -445,8 +451,8 @@ def crear_stacked_ingresos_categoria(df_filtrado):
 # GRÁFICO: Detalle de las Finanzas
 # ============================================
 def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
-    ingreso_val = float(df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum())
-    gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())
+    ingreso_val = float(df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum()) if len(df_filtrado) > 0 else 0
+    gasto_val   = float(df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum())   if len(df_filtrado) > 0 else 0
     ahorro_val  = max(float(presupuesto_disponible), 0)
 
     segmentos = [
@@ -470,13 +476,11 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
             legendrank=rank + 1,
         ))
 
-    # ← Sin ninguna anotación lateral, los valores ya están dentro de cada barra
-
     fig.update_layout(
         barmode='stack',
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=CHART_H, margin=dict(l=12, r=20, t=28, b=20),  # ← r reducido a 20 ya que no hay etiqueta lateral
+        height=CHART_H, margin=dict(l=12, r=20, t=28, b=20),
         xaxis=dict(showgrid=False, visible=False, fixedrange=True, zeroline=False),
         yaxis=dict(tickfont={'family':'Roboto Condensed','size':FONT_AXIS,'color':TICK_COLOR}, fixedrange=True),
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0,
@@ -489,20 +493,16 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
 
 # ============================================
 # GRÁFICO: Gastos por Día
-# Línea sin puntos, hover individual por día,
-# eje X con números del 1 al N del mes
 # ============================================
 def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
     tema   = st.get_option("theme.base")
     grid_c = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
 
-    # Todos los días del mes seleccionado
     dias_en_mes = calendar.monthrange(año_filtro, mes_filtro)[1]
     todos_dias  = list(range(1, dias_en_mes + 1))
 
-    gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
+    gastos = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy() if len(df_filtrado) > 0 else pd.DataFrame()
 
-    # Suma por día, rellenando con 0 los días sin gasto
     if len(gastos) > 0:
         por_dia = gastos.groupby('Dia')['Monto'].sum()
         valores = [float(por_dia.get(d, 0)) for d in todos_dias]
@@ -511,10 +511,9 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
 
     max_val = max(valores) if max(valores) > 0 else 1
 
-    # Texto de hover: solo 1 día a la vez, con desglose por categoría
     hover_texts = []
     for d, v in zip(todos_dias, valores):
-        if v > 0:
+        if v > 0 and len(gastos) > 0:
             detalle = gastos[gastos['Dia'] == d].groupby('Categoría')['Monto'].sum()
             lineas  = [f"{cat}: ${monto:,.0f}" for cat, monto in detalle.items()]
             detalle_str = "<br>".join(lineas)
@@ -526,71 +525,43 @@ def crear_gastos_por_dia(df_filtrado, año_filtro, mes_filtro):
 
     fig = go.Figure()
 
-    # Área relleno suave bajo la curva
     fig.add_trace(go.Scatter(
-        x=todos_dias,
-        y=valores,
-        mode='lines',
-        fill='tozeroy',
-        fillcolor='rgba(0,129,255,0.07)',
+        x=todos_dias, y=valores, mode='lines',
+        fill='tozeroy', fillcolor='rgba(0,129,255,0.07)',
         line=dict(color='rgba(0,0,0,0)', width=0),
-        showlegend=False,
-        hoverinfo='skip',
+        showlegend=False, hoverinfo='skip',
     ))
 
-    # Línea principal — SIN marcadores, hover individual por punto (closest)
     fig.add_trace(go.Scatter(
-        x=todos_dias,
-        y=valores,
-        mode='lines',
+        x=todos_dias, y=valores, mode='lines',
         line=dict(color=COLORS['azul'], width=2, shape='spline', smoothing=0.5),
         text=hover_texts,
         hovertemplate='%{text}<extra></extra>',
         showlegend=False,
     ))
 
-    # Determinar paso del tick para que no se amontonen los números
-    # Mostrar cada día si ≤ 31, pero con tamaño pequeño y sin inclinación
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=412,
-        margin=dict(l=62, r=32, t=14, b=40),
-        xaxis=dict(
-            showgrid=False,
-            showticklabels=False,
-            fixedrange=True,
-            zeroline=False,
-            range=[0.5, dias_en_mes + 2],
-        ),
-        yaxis=dict(
-            showgrid=True,
-            gridcolor=grid_c, gridwidth=0.3,
-            tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
-            tickformat='$,.0f',
-            tickprefix='$',
-            fixedrange=True,
-            range=[0, y_max],
-            zeroline=False,
-            rangemode='tozero',
-            nticks=5,
-        ),
+        height=412, margin=dict(l=62, r=32, t=14, b=40),
+        xaxis=dict(showgrid=False, showticklabels=False, fixedrange=True,
+                   zeroline=False, range=[0.5, dias_en_mes + 2]),
+        yaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
+                   tickfont={'family': 'Roboto Condensed', 'size': 11, 'color': TICK_COLOR},
+                   tickformat='$,.0f', tickprefix='$', fixedrange=True,
+                   range=[0, y_max], zeroline=False, rangemode='tozero', nticks=5),
         hovermode='closest',
-        hoverlabel=dict(
-            bgcolor="white" if tema != "dark" else "#1F2937",
-            bordercolor=COLORS['azul'],
-            font=dict(size=12, family='Roboto Condensed', color='#222222'),
-            namelength=0,
-        ),
+        hoverlabel=dict(bgcolor="white" if tema != "dark" else "#1F2937",
+                        bordercolor=COLORS['azul'],
+                        font=dict(size=12, family='Roboto Condensed', color='#222222'),
+                        namelength=0),
         dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
     return fig
 
 # ============================================
-# GRÁFICO: Ahorro por Mes — barras verticales con scroll
-# Azul = ahorro positivo | Rosa = déficit negativo
-# Línea de 0, etiquetas arriba/abajo de cada barra
+# GRÁFICO: Ahorro por Mes
 # ============================================
 def crear_lineas_ahorro_mensual(df, año_filtro):
     tema     = st.get_option("theme.base")
@@ -607,11 +578,10 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
             (df['Tipo'] == 'Gasto') &
             (df['Año'] == año_filtro) &
             (df['Mes'] == m)
-        ]['Monto'].sum()
+        ]['Monto'].sum() if len(df) > 0 else 0
         tiene_actividad = (pres > 0) or (gasto > 0)
         ahorros.append(float(pres - gasto) if tiene_actividad else None)
 
-    # Color por barra: azul=ahorro, rosa=déficit, gris=sin datos
     bar_colors = []
     for v in ahorros:
         if v is None:
@@ -621,38 +591,27 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
         else:
             bar_colors.append(COLORS['rosa'])
 
-    # Valores para la barra (None → 0 visual pero sin etiqueta)
     bar_vals = [v if v is not None else 0 for v in ahorros]
 
-    # Rango Y: siempre incluye 0 visible con margen para etiquetas
     vals_validos = [v for v in ahorros if v is not None]
     if vals_validos:
         min_v   = min(vals_validos)
         max_v   = max(vals_validos)
         abs_max = max(abs(min_v), abs(max_v), 1)
         pad     = abs_max * 0.55
-        # Garantizar que el 0 siempre quede visible en el centro aprox
         y_min   = min(min_v - pad, -abs_max * 0.20)
         y_max   = max(max_v + pad,  abs_max * 0.20)
     else:
         y_min, y_max = -500, 500
 
     fig = go.Figure()
-
-    # Barras
     fig.add_trace(go.Bar(
-        x=meses_l,
-        y=bar_vals,
-        marker=dict(
-            color=bar_colors,
-            opacity=0.88,
-            line=dict(width=0),
-        ),
+        x=meses_l, y=bar_vals,
+        marker=dict(color=bar_colors, opacity=0.88, line=dict(width=0)),
         hovertemplate='<b>%{x}</b><br>$%{y:,.0f}<extra></extra>',
         showlegend=False,
     ))
 
-    # Etiquetas sobre/bajo cada barra
     annotations = []
     for mes, val in zip(meses_l, ahorros):
         if val is None:
@@ -661,63 +620,40 @@ def crear_lineas_ahorro_mensual(df, año_filtro):
         yshift    = 18 if val >= 0 else -18
         yanchor   = 'bottom' if val >= 0 else 'top'
         annotations.append(dict(
-            x=mes, y=val,
-            text=f'${val:,.0f}',
-            showarrow=False,
-            yshift=yshift,
-            xanchor='center',
-            yanchor=yanchor,
+            x=mes, y=val, text=f'${val:,.0f}',
+            showarrow=False, yshift=yshift, xanchor='center', yanchor=yanchor,
             font=dict(family='Roboto Condensed', size=13, color=color_lbl),
-            bgcolor=bg_label,
-            borderpad=3,
+            bgcolor=bg_label, borderpad=3,
         ))
 
-    # Leyenda como anotaciones de texto
     legend_annotations = [
-        dict(
-            x=0, y=1.16, xref='paper', yref='paper',
-            text=f'<span style="color:{COLORS["azul"]}">●</span> Ahorro',
-            showarrow=False, xanchor='left',
-            font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
-        ),
-        dict(
-            x=0.20, y=1.16, xref='paper', yref='paper',
-            text=f'<span style="color:{COLORS["rosa"]}">●</span> Déficit',
-            showarrow=False, xanchor='left',
-            font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR),
-        ),
+        dict(x=0, y=1.16, xref='paper', yref='paper',
+             text=f'<span style="color:{COLORS["azul"]}">●</span> Ahorro',
+             showarrow=False, xanchor='left',
+             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR)),
+        dict(x=0.20, y=1.16, xref='paper', yref='paper',
+             text=f'<span style="color:{COLORS["rosa"]}">●</span> Déficit',
+             showarrow=False, xanchor='left',
+             font=dict(family='Roboto Condensed', size=11, color=TICK_COLOR)),
     ]
 
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         font={'family': 'Roboto Condensed', 'color': TICK_COLOR},
-        height=412,
-        margin=dict(l=60, r=8, t=52, b=90),
-        xaxis=dict(
-            showgrid=False,
-            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
-            tickangle=-45,
-            fixedrange=False,
-        ),
-        yaxis=dict(
-            showgrid=True, gridcolor=grid_c, gridwidth=0.3,
-            tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
-            fixedrange=True,
-            range=[y_min, y_max],
-            zeroline=True,
-            zerolinecolor='rgba(150,150,150,0.8)',
-            zerolinewidth=2,
-        ),
+        height=412, margin=dict(l=60, r=8, t=52, b=90),
+        xaxis=dict(showgrid=False,
+                   tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+                   tickangle=-45, fixedrange=False),
+        yaxis=dict(showgrid=True, gridcolor=grid_c, gridwidth=0.3,
+                   tickfont={'family': 'Roboto Condensed', 'size': FONT_AXIS, 'color': TICK_COLOR},
+                   fixedrange=True, range=[y_min, y_max],
+                   zeroline=True, zerolinecolor='rgba(150,150,150,0.8)', zerolinewidth=2),
         showlegend=False,
         annotations=annotations + legend_annotations,
         hovermode='x unified',
-        hoverlabel=dict(
-            bgcolor="white" if tema != "dark" else "#1F2937",
-            font_size=12,
-            font_family='Roboto Condensed',
-        ),
-        bargap=0.35,
-        dragmode=False,
+        hoverlabel=dict(bgcolor="white" if tema != "dark" else "#1F2937",
+                        font_size=12, font_family='Roboto Condensed'),
+        bargap=0.35, dragmode=False,
         modebar={'remove': ['zoom','pan','select','lasso2d','zoomIn2d','zoomOut2d','autoScale2d','resetScale2d']},
     )
     return fig
@@ -730,12 +666,13 @@ def crear_lineas_presupuesto_gasto_anual(df, año_filtro):
     grid_c   = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
     bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
 
-    df_año  = df[df['Año'] == año_filtro].copy()
+    df_año  = df[df['Año'] == año_filtro].copy() if len(df) > 0 else pd.DataFrame()
     meses_n = list(range(1, 13))
     meses_l = [MESES[m] for m in meses_n]
 
     presupuestos = [obtener_ultimo_presupuesto_mes(df_año, año_filtro, m) for m in meses_n]
-    gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
+    gastos_list  = [df_año[(df_año['Tipo']=='Gasto')&(df_año['Mes']==m)]['Monto'].sum()
+                    if len(df_año) > 0 else 0 for m in meses_n]
 
     max_v = max(max(presupuestos), max(gastos_list)) if any(presupuestos) or any(gastos_list) else 100
     y_max = max_v * 1.35
@@ -787,12 +724,14 @@ def crear_lineas_ingreso_gasto_mensual(df, año_filtro):
     grid_c   = GRID_COLOR_DARK if tema == "dark" else GRID_COLOR_LIGHT
     bg_label = "rgba(150,150,150,0.12)" if tema != "dark" else "rgba(80,80,80,0.12)"
 
-    df_año  = df[df['Año'] == año_filtro].copy()
+    df_año  = df[df['Año'] == año_filtro].copy() if len(df) > 0 else pd.DataFrame()
     meses_n = list(range(1, 13))
     meses_l = [MESES[m] for m in meses_n]
 
-    ingresos = [df_año[(df_año['Tipo']=='Ingreso')&(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
-    gastos_l = [df_año[(df_año['Tipo']=='Gasto') &(df_año['Mes']==m)]['Monto'].sum() for m in meses_n]
+    ingresos = [df_año[(df_año['Tipo']=='Ingreso')&(df_año['Mes']==m)]['Monto'].sum()
+                if len(df_año) > 0 else 0 for m in meses_n]
+    gastos_l = [df_año[(df_año['Tipo']=='Gasto') &(df_año['Mes']==m)]['Monto'].sum()
+                if len(df_año) > 0 else 0 for m in meses_n]
 
     max_v = max(max(ingresos), max(gastos_l)) if any(ingresos) or any(gastos_l) else 100
     y_max = max_v * 1.35
@@ -877,10 +816,8 @@ def render_lineas_chart_mobile(fig, chart_id, chart_height=None):
     components.html(html_content, height=chart_height, scrolling=False)
 
 
-
 # ============================================
-# HELPER: wrapper con hover habilitado (para gráfico de línea diaria)
-# Mismo estilo visual que render_lineas_chart_mobile pero staticPlot=False
+# HELPER: wrapper con hover habilitado
 # ============================================
 def render_hover_chart(fig, chart_id, chart_height=440):
     fig_html = pio.to_html(fig, full_html=False, include_plotlyjs=False,
@@ -976,17 +913,23 @@ with header_col1:
 with header_col2:
     st.markdown('<div style="padding-top: 10px;">', unsafe_allow_html=True)
 
-    años_disponibles = sorted(df['Año'].unique(), reverse=True)
     año_actual = datetime.now().year
     mes_actual = datetime.now().month
 
+    # ── CORRECCIÓN PRINCIPAL: nunca crashear con lista vacía ──────────────────
+    años_disponibles = sorted(df['Año'].unique(), reverse=True) if len(df) > 0 else []
+    if not años_disponibles:
+        años_disponibles = [año_actual]
+    # ──────────────────────────────────────────────────────────────────────────
+
     if 'filtros_aplicados' not in st.session_state:
         todos_dias = sorted(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]['Dia'].unique()) \
-                     if len(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]) > 0 else []
+                     if len(df) > 0 and len(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]) > 0 else []
         st.session_state.filtros_aplicados = {
             'categoria': CATEGORIAS_GASTO.copy(),
             'año': año_actual if año_actual in años_disponibles else años_disponibles[0],
-            'mes': mes_actual, 'dia': todos_dias
+            'mes': mes_actual,
+            'dia': todos_dias
         }
 
     if 'widget_key' not in st.session_state:
@@ -1004,22 +947,31 @@ with header_col2:
             categorias_seleccionadas = CATEGORIAS_GASTO.copy()
 
     with fc2:
+        # Siempre apuntar al año actual por defecto
+        año_idx = años_disponibles.index(año_actual) if año_actual in años_disponibles else 0
         año_seleccionado = st.selectbox("Año", options=años_disponibles,
-            index=años_disponibles.index(st.session_state.filtros_aplicados['año'])
-                  if st.session_state.filtros_aplicados['año'] in años_disponibles else 0,
+            index=año_idx,
             key=f'filtro_año_{st.session_state.widget_key}', placeholder="Año")
 
     with fc3:
-        meses_disponibles = sorted(df[df['Año']==año_seleccionado]['Mes'].unique())
-        default_mes_idx   = meses_disponibles.index(mes_actual) if mes_actual in meses_disponibles \
-                            else (meses_disponibles.index(st.session_state.filtros_aplicados['mes'])
-                                  if st.session_state.filtros_aplicados['mes'] in meses_disponibles else 0)
+        # Meses con datos para el año seleccionado; si no hay datos, mostrar todos los meses
+        meses_con_datos = sorted(df[df['Año']==año_seleccionado]['Mes'].unique()) \
+                          if len(df) > 0 else []
+        meses_disponibles = meses_con_datos if meses_con_datos else list(range(1, 13))
+
+        # Siempre apuntar al mes actual por defecto
+        if mes_actual in meses_disponibles:
+            default_mes_idx = meses_disponibles.index(mes_actual)
+        else:
+            default_mes_idx = 0
+
         mes_seleccionado = st.selectbox("Mes", options=meses_disponibles,
             format_func=lambda x: MESES[x], index=default_mes_idx,
             key=f'filtro_mes_{st.session_state.widget_key}', placeholder="Mes")
 
     with fc4:
-        df_temp = df[(df['Año']==año_seleccionado)&(df['Mes']==mes_seleccionado)]
+        df_temp = df[(df['Año']==año_seleccionado)&(df['Mes']==mes_seleccionado)] \
+                  if len(df) > 0 else pd.DataFrame()
         dias_disponibles = sorted(df_temp['Dia'].unique()) if len(df_temp) > 0 else list(range(1, 32))
         default_dias = [] if len(st.session_state.filtros_aplicados['dia']) == len(dias_disponibles) \
                        else [d for d in st.session_state.filtros_aplicados['dia'] if d in dias_disponibles]
@@ -1032,11 +984,12 @@ with header_col2:
         if st.button("Limpiar Filtros", use_container_width=True):
             st.session_state.widget_key += 1
             todos_dias_reset = sorted(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]['Dia'].unique()) \
-                               if len(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]) > 0 else []
+                               if len(df) > 0 and len(df[(df['Año']==año_actual)&(df['Mes']==mes_actual)]) > 0 else []
             st.session_state.filtros_aplicados = {
                 'categoria': CATEGORIAS_GASTO.copy(),
                 'año': año_actual if año_actual in años_disponibles else años_disponibles[0],
-                'mes': mes_actual, 'dia': todos_dias_reset
+                'mes': mes_actual,
+                'dia': todos_dias_reset
             }
             st.rerun()
 
@@ -1052,16 +1005,20 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 # APLICAR FILTROS
 # ============================================
-df_filtrado = df[
-    (df['Año'] == año_seleccionado) &
-    (df['Mes'] == mes_seleccionado)
-].copy()
+if len(df) > 0:
+    df_filtrado = df[
+        (df['Año'] == año_seleccionado) &
+        (df['Mes'] == mes_seleccionado)
+    ].copy()
 
-if categorias_seleccionadas and len(categorias_seleccionadas) < len(CATEGORIAS_GASTO):
-    df_filtrado = df_filtrado[df_filtrado['Categoría'].isin(categorias_seleccionadas)]
+    if categorias_seleccionadas and len(categorias_seleccionadas) < len(CATEGORIAS_GASTO):
+        df_filtrado = df_filtrado[df_filtrado['Categoría'].isin(categorias_seleccionadas)]
 
-if dias_seleccionados and len(dias_seleccionados) < len(dias_disponibles):
-    df_filtrado = df_filtrado[df_filtrado['Dia'].isin(dias_seleccionados)]
+    if dias_seleccionados and len(dias_seleccionados) < len(dias_disponibles):
+        df_filtrado = df_filtrado[df_filtrado['Dia'].isin(dias_seleccionados)]
+else:
+    # Sin datos: DataFrame vacío con las columnas esperadas
+    df_filtrado = pd.DataFrame(columns=['Año','Mes','Dia','Tipo','Categoría','Monto','Fecha','Descripción'])
 
 # ============================================
 # MÉTRICAS
@@ -1069,8 +1026,8 @@ if dias_seleccionados and len(dias_seleccionados) < len(dias_disponibles):
 presupuesto_disponible, presupuesto_mes, gastos_mes = calcular_presupuesto_disponible(
     df, año_seleccionado, mes_seleccionado)
 
-ingresos_total = df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum()
-gastos_total   = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()
+ingresos_total = df_filtrado[df_filtrado['Tipo'] == 'Ingreso']['Monto'].sum() if len(df_filtrado) > 0 else 0
+gastos_total   = df_filtrado[df_filtrado['Tipo'] == 'Gasto']['Monto'].sum()   if len(df_filtrado) > 0 else 0
 
 col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -1144,7 +1101,7 @@ with col2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ============================================
-# FILA 3 (NUEVA): Gastos por Día | Ahorro por Mes
+# FILA 3: Gastos por Día | Ahorro por Mes
 # ============================================
 col1, col2 = st.columns(2)
 with col1:
@@ -1172,8 +1129,8 @@ st.markdown("<br>", unsafe_allow_html=True)
 # ============================================
 # TABLAS
 # ============================================
-df_gastos   = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()
-df_ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy()
+df_gastos   = df_filtrado[df_filtrado['Tipo'] == 'Gasto'].copy()   if len(df_filtrado) > 0 else pd.DataFrame()
+df_ingresos = df_filtrado[df_filtrado['Tipo'] == 'Ingreso'].copy() if len(df_filtrado) > 0 else pd.DataFrame()
 
 def formatear_fecha_espanol(fecha):
     meses_abrev = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',
@@ -1275,7 +1232,6 @@ with col2:
 
 st.markdown("<br><br>", unsafe_allow_html=True)
 
-# ============================================
 # ============================================
 # FOOTER
 # ============================================
