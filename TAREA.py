@@ -461,7 +461,7 @@ def crear_stacked_resumen_mes(df_filtrado, presupuesto_disponible):
         ('Ahorro',  ahorro_val,  COLORS['azul']),
     ]
 
-    label_y = ['Finanzas']
+    label_y = []
 
     fig = go.Figure()
     for rank, (nombre, val, color) in enumerate(segmentos):
